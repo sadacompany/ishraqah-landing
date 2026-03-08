@@ -18,5 +18,5 @@ export const siteConfig = {
     { label: 'المقالات', href: '/articles' },
     { label: 'المؤلفات', href: '/books' },
     { label: 'بصمة الزوار', href: '/guestbook' },
-  ],
+  ] as { label: string; href: string; children?: { label: string; href: string }[] }[],
 };
