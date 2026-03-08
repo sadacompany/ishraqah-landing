@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import pool from '@/lib/db';
 
-export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 export const alt = 'إشراقة نفسية';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -16,6 +16,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const title = article?.title || 'إشراقة نفسية';
   const category = article?.categoryLabel || '';
 
+  const fontData = await fetch(
+    'https://fonts.gstatic.com/s/tajawal/v9/Iura6YBj_oCad4k1nzGBCw.ttf'
+  ).then((res) => res.arrayBuffer());
+
   return new ImageResponse(
     (
       <div
@@ -27,43 +31,21 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           justifyContent: 'space-between',
           backgroundColor: '#FAF8F5',
           padding: 60,
-          fontFamily: 'sans-serif',
+          fontFamily: 'Tajawal',
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {category && (
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 22,
-                color: '#8B6F4E',
-                marginBottom: 20,
-              }}
-            >
+            <div style={{ display: 'flex', fontSize: 22, color: '#8B6F4E', marginBottom: 20 }}>
               {category}
             </div>
           )}
-          <div
-            style={{
-              display: 'flex',
-              fontSize: 52,
-              fontWeight: 700,
-              color: '#2C2825',
-              lineHeight: 1.4,
-              maxWidth: '90%',
-            }}
-          >
+          <div style={{ display: 'flex', fontSize: 52, fontWeight: 700, color: '#2C2825', lineHeight: 1.4 }}>
             {title}
           </div>
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
               <g stroke="#8B6F4E" strokeLinecap="round">
@@ -84,6 +66,9 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [{ name: 'Tajawal', data: fontData, style: 'normal', weight: 700 }],
+    }
   );
 }
