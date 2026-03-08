@@ -44,7 +44,10 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd /var/www/ishraqah
-            npm ci --production
-            npx pm2 restart ishraqah || npx pm2 start npm --name ishraqah -- start
-            npx pm2 save
+            pkill -9 -f "npm ci" 2>/dev/null || true
+            pkill -9 -f "npm install" 2>/dev/null || true
+            sleep 2
+            npm ci
+            pm2 restart ishraqah || pm2 start npm --name ishraqah -- start
+            pm2 save
           EOF
