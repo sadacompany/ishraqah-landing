@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SectionHeading } from '@/components/SectionHeading';
 import { ArticleCard } from '@/components/ArticleCard';
-import { QuoteCard } from '@/components/QuoteCard';
 import { FounderBio } from '@/components/FounderBio';
 import { ConsultationCard } from '@/components/ConsultationCard';
 import pool from '@/lib/db';
@@ -10,16 +9,14 @@ import pool from '@/lib/db';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const [articlesResult, featuredResult, quotesResult, consultationsResult] = await Promise.all([
+  const [articlesResult, featuredResult, consultationsResult] = await Promise.all([
     pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, image_url as "imageUrl", read_time as "readTime" FROM articles WHERE hidden = false ORDER BY created_at DESC LIMIT 7`),
     pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, image_url as "imageUrl", read_time as "readTime" FROM articles WHERE featured = true AND hidden = false ORDER BY created_at DESC LIMIT 3`),
-    pool.query(`SELECT id, text FROM quotes WHERE hidden = false ORDER BY created_at ASC LIMIT 6`),
     pool.query(`SELECT id, type as category, text as question, answer FROM consultations WHERE status = 'archived' AND answer != '' ORDER BY created_at DESC LIMIT 3`),
   ]);
 
   const articles = articlesResult.rows;
   const featuredArticles = featuredResult.rows;
-  const selectedQuotes = quotesResult.rows;
   const consultations = consultationsResult.rows.map((c: { id: string; category: string; question: string; answer: string }) => ({
     id: c.id,
     title: c.category || 'استشارة',
@@ -44,9 +41,7 @@ export default async function Home() {
               </span>
             </div>
             <h1 className="animate-fade-in-up-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-charcoal leading-[1.4] sm:leading-[1.35]">
-              نشر الوعي النفسي والتربوي
-              <br />
-              <span className="text-bronze">من خلال الاستشارات والمؤلفات</span>
+              <span className="text-bronze">إشراقة</span> لنشر الوعي النفسي والتربوي
             </h1>
             <p className="animate-fade-in-up-delay-2 mt-6 text-lg text-charcoal-light leading-relaxed max-w-xl">
               منصة متخصصة تساعدك على فهم ذاتك وتحسين حياتك النفسية والتربوية
@@ -352,22 +347,6 @@ export default async function Home() {
                 ابدأ الاختبار
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quotes / Kharbshat */}
-      <section className="py-16 sm:py-20 bg-cream-warm/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            title="خربشات قلم"
-            subtitle="تأملات ورؤى نفسية وتربوية"
-            centered
-          />
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {selectedQuotes.map((quote) => (
-              <QuoteCard key={quote.id} quote={quote} />
-            ))}
           </div>
         </div>
       </section>
