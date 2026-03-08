@@ -24,6 +24,7 @@ const emptyArticle: Omit<StoredArticle, 'id'> = {
   categoryLabel: 'علم النفس',
   featured: false,
   hidden: false,
+  imageUrl: '',
   readTime: 3,
 };
 
@@ -174,6 +175,16 @@ export default function AdminArticlesPage() {
                 onChange={(e) => setEditing({ ...editing, content: e.target.value })}
                 rows={8}
                 className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-1">رابط الصورة</label>
+              <input
+                value={editing.imageUrl}
+                onChange={(e) => setEditing({ ...editing, imageUrl: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+                placeholder="https://images.unsplash.com/..."
+                dir="ltr"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">

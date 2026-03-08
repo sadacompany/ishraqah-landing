@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Logo } from '@/components/Logo';
 
 const navItems = [
   { href: '/admin', label: 'لوحة التحكم', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -20,9 +21,12 @@ export function AdminSidebar() {
   return (
     <aside className="fixed right-0 top-0 h-screen w-64 bg-charcoal text-white flex flex-col z-40">
       <div className="p-6 border-b border-white/10">
-        <Link href="/admin" className="block">
-          <h1 className="text-lg font-bold text-bronze-light">إشراقة نفسية</h1>
-          <p className="text-xs text-white/50 mt-1">لوحة التحكم</p>
+        <Link href="/admin" className="flex items-center gap-3">
+          <Logo size={36} className="text-bronze-light" />
+          <div>
+            <h1 className="text-lg font-bold text-bronze-light leading-tight">إشراقة نفسية</h1>
+            <p className="text-xs text-white/50">لوحة التحكم</p>
+          </div>
         </Link>
       </div>
 

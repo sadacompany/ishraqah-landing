@@ -39,6 +39,7 @@ export interface StoredArticle {
   categoryLabel: string;
   featured: boolean;
   hidden: boolean;
+  imageUrl: string;
   readTime: number;
   createdAt?: string;
   updatedAt?: string;

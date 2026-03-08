@@ -21,6 +21,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     categoryLabel: 'category_label',
     featured: 'featured',
     hidden: 'hidden',
+    imageUrl: 'image_url',
     readTime: 'read_time',
   };
 

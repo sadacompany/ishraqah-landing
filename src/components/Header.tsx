@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { siteConfig } from '@/data/site';
+import { Logo } from '@/components/Logo';
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -13,9 +14,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-bronze to-bronze-light flex items-center justify-center">
-              <span className="text-white text-lg font-bold">إ</span>
-            </div>
+            <Logo size={40} className="text-bronze" />
             <div>
               <h1 className="text-lg font-bold text-charcoal leading-tight">
                 إشراقة نفسية

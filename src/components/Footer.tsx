@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
@@ -8,9 +9,7 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-bronze to-bronze-light flex items-center justify-center">
-                <span className="text-white text-lg font-bold">إ</span>
-              </div>
+              <Logo size={40} className="text-bronze-light" />
               <h3 className="text-lg font-bold text-white">إشراقة نفسية</h3>
             </div>
             <p className="text-sm text-cream-dark/80 leading-relaxed">
@@ -24,10 +23,10 @@ export function Footer() {
             <h4 className="text-sm font-bold text-white mb-4">روابط سريعة</h4>
             <ul className="space-y-2.5">
               {[
-                { label: 'من نحن', href: '/about' },
+                { label: 'السيرة الذاتية', href: '/cv' },
                 { label: 'المقالات', href: '/articles' },
-                { label: 'الاستشارات', href: '/consultations' },
                 { label: 'المؤلفات', href: '/books' },
+                { label: 'بصمة الزوار', href: '/guestbook' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -47,9 +46,7 @@ export function Footer() {
             <ul className="space-y-2.5">
               {[
                 { label: 'استشارة جديدة', href: '/consultations/new' },
-                { label: 'متابعة استشارة', href: '/consultations/follow-up' },
-                { label: 'اختبر نفسك', href: '/self-test' },
-                { label: 'الفيديو', href: '/videos' },
+                { label: 'أرشيف الاستشارات', href: '/consultations/archive' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link

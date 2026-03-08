@@ -21,7 +21,7 @@ const categoryLabels: Record<string, string> = {
 export default async function ArticlesPage() {
   const result = await pool.query(
     `SELECT id, slug, title, excerpt, category, category_label as "categoryLabel",
-            featured, read_time as "readTime"
+            featured, image_url as "imageUrl", read_time as "readTime"
      FROM articles WHERE hidden = false ORDER BY created_at DESC`
   );
   const articles = result.rows;
@@ -68,7 +68,7 @@ export default async function ArticlesPage() {
 
       {/* Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articles.map((article: { id: string; slug: string; title: string; excerpt: string; category: string; categoryLabel: string; featured: boolean; readTime: number }) => (
+        {articles.map((article: { id: string; slug: string; title: string; excerpt: string; category: string; categoryLabel: string; featured: boolean; imageUrl: string; readTime: number }) => (
           <ArticleCard key={article.id} article={article} />
         ))}
       </div>

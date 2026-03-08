@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { Logo } from '@/components/Logo';
 
 export default function AdminLoginPage() {
   const { login, loading } = useAuth();
@@ -38,11 +39,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-charcoal flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-bronze-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
+          <Logo size={64} className="mx-auto text-charcoal mb-4" />
           <h1 className="text-2xl font-bold text-charcoal">إشراقة نفسية</h1>
           <p className="text-sm text-charcoal-light mt-1">تسجيل الدخول للوحة التحكم</p>
         </div>

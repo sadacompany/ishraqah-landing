@@ -1,46 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 140" dir="rtl">
-  <defs>
-    <linearGradient id="sunGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#C9A882"/>
-      <stop offset="50%" stop-color="#8B6F4E"/>
-      <stop offset="100%" stop-color="#C9A882"/>
-    </linearGradient>
-    <linearGradient id="rayGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#8B6F4E" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#C9A882" stop-opacity="0.3"/>
-    </linearGradient>
-    <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#C9A882" stop-opacity="0"/>
-      <stop offset="50%" stop-color="#8B6F4E" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#C9A882" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Sun symbol - subtle half sun with rays -->
-  <g transform="translate(358, 70)">
-    <!-- Rays of light -->
-    <line x1="0" y1="-12" x2="0" y2="-28" stroke="url(#rayGrad)" stroke-width="1.8" stroke-linecap="round"/>
-    <line x1="0" y1="-12" x2="0" y2="-28" stroke="url(#rayGrad)" stroke-width="1.8" stroke-linecap="round" transform="rotate(-30)"/>
-    <line x1="0" y1="-12" x2="0" y2="-28" stroke="url(#rayGrad)" stroke-width="1.8" stroke-linecap="round" transform="rotate(-60)"/>
-    <line x1="0" y1="-12" x2="0" y2="-28" stroke="url(#rayGrad)" stroke-width="1.8" stroke-linecap="round" transform="rotate(30)"/>
-    <line x1="0" y1="-12" x2="0" y2="-28" stroke="url(#rayGrad)" stroke-width="1.8" stroke-linecap="round" transform="rotate(60)"/>
-    <line x1="0" y1="-12" x2="0" y2="-24" stroke="url(#rayGrad)" stroke-width="1.2" stroke-linecap="round" transform="rotate(-15)"/>
-    <line x1="0" y1="-12" x2="0" y2="-24" stroke="url(#rayGrad)" stroke-width="1.2" stroke-linecap="round" transform="rotate(15)"/>
-    <line x1="0" y1="-12" x2="0" y2="-24" stroke="url(#rayGrad)" stroke-width="1.2" stroke-linecap="round" transform="rotate(-45)"/>
-    <line x1="0" y1="-12" x2="0" y2="-24" stroke="url(#rayGrad)" stroke-width="1.2" stroke-linecap="round" transform="rotate(45)"/>
-
-    <!-- Half sun circle -->
-    <path d="M -14 0 A 14 14 0 0 1 14 0" fill="url(#sunGlow)" opacity="0.9"/>
-    <!-- Horizon line -->
-    <line x1="-22" y1="0" x2="22" y2="0" stroke="#8B6F4E" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Rays -->
+  <g stroke="#8B6F4E" stroke-linecap="round">
+    <line x1="32" y1="24" x2="32" y2="10" stroke-width="2.2" opacity="0.9" />
+    <line x1="32" y1="24" x2="32" y2="10" stroke-width="2.2" opacity="0.9" transform="rotate(-30 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="10" stroke-width="2.2" opacity="0.9" transform="rotate(30 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="12" stroke-width="2.2" opacity="0.8" transform="rotate(-60 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="12" stroke-width="2.2" opacity="0.8" transform="rotate(60 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="14" stroke-width="1.5" opacity="0.5" transform="rotate(-15 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="14" stroke-width="1.5" opacity="0.5" transform="rotate(15 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="14" stroke-width="1.5" opacity="0.5" transform="rotate(-45 32 36)" />
+    <line x1="32" y1="24" x2="32" y2="14" stroke-width="1.5" opacity="0.5" transform="rotate(45 32 36)" />
   </g>
-
-  <!-- Main text: إشراقة -->
-  <text x="340" y="72" font-family="'Tajawal', 'Cairo', 'Noto Kufi Arabic', sans-serif" font-size="48" font-weight="700" fill="#2C2825" text-anchor="end" direction="rtl" letter-spacing="1">إشراقة</text>
-
-  <!-- Subtitle: نفسية -->
-  <text x="340" y="102" font-family="'Tajawal', 'Cairo', 'Noto Kufi Arabic', sans-serif" font-size="22" font-weight="400" fill="#8B6F4E" text-anchor="end" direction="rtl" letter-spacing="3">نفسية</text>
-
-  <!-- Decorative underline -->
-  <rect x="248" y="112" width="92" height="1.5" rx="0.75" fill="url(#arcGrad)"/>
+  <!-- Half sun -->
+  <path d="M 16 36 A 16 16 0 0 1 48 36" fill="#8B6F4E" opacity="0.85" />
+  <!-- Horizon / wave -->
+  <path d="M 8 36 Q 20 42 32 36 Q 44 30 56 36" stroke="#8B6F4E" stroke-width="2" stroke-linecap="round" opacity="0.6" fill="none" />
+  <!-- Second wave -->
+  <path d="M 12 42 Q 22 47 32 42 Q 42 37 52 42" stroke="#8B6F4E" stroke-width="1.5" stroke-linecap="round" opacity="0.3" fill="none" />
 </svg>

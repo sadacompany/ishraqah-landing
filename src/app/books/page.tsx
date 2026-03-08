@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -28,16 +29,14 @@ export default function BooksPage() {
         <div className="flex flex-col lg:flex-row">
           {/* Book Cover */}
           <div className="lg:w-80 shrink-0 bg-gradient-to-br from-charcoal to-charcoal-light p-10 flex items-center justify-center">
-            <div className="w-48 h-64 rounded-xl bg-gradient-to-br from-bronze to-bronze-light shadow-2xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-white/80 text-xs mb-2">كتاب</div>
-                <div className="text-white text-2xl font-bold">إشراقة</div>
-                <div className="mt-4 w-10 h-0.5 bg-white/30 mx-auto" />
-                <div className="text-white/60 text-[10px] mt-3">
-                  رانية طه الودية
-                </div>
-              </div>
-            </div>
+            <Image
+              src="/book-cover.jpg"
+              alt="كتاب إشراقة - رانية طه الودية"
+              width={240}
+              height={340}
+              className="rounded-xl shadow-2xl"
+              priority
+            />
           </div>
 
           {/* Book Details */}

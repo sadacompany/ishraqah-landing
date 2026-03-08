@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArticleCard } from '@/components/ArticleCard';
@@ -14,7 +15,7 @@ interface Props {
 async function getArticle(slug: string) {
   const result = await pool.query(
     `SELECT id, slug, title, excerpt, content, category, category_label as "categoryLabel",
-            featured, hidden, read_time as "readTime"
+            featured, hidden, image_url as "imageUrl", read_time as "readTime"
      FROM articles WHERE slug = $1`,
     [slug]
   );
@@ -24,7 +25,7 @@ async function getArticle(slug: string) {
 async function getRelatedArticles(category: string, excludeId: string) {
   const result = await pool.query(
     `SELECT id, slug, title, excerpt, category, category_label as "categoryLabel",
-            featured, read_time as "readTime"
+            featured, image_url as "imageUrl", read_time as "readTime"
      FROM articles WHERE category = $1 AND id != $2 AND hidden = false LIMIT 3`,
     [category, excludeId]
   );
@@ -81,6 +82,18 @@ export default async function ArticlePage({ params }: Props) {
         <span className="mx-2">/</span>
         <span className="text-charcoal">{article.title}</span>
       </nav>
+
+      {article.imageUrl && (
+        <div className="relative w-full h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden mb-8">
+          <Image
+            src={article.imageUrl}
+            alt={article.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
 
       <header className="mb-10">
         <span className="inline-block px-2.5 py-1 text-[11px] font-medium text-teal bg-teal-pale rounded-full mb-4">

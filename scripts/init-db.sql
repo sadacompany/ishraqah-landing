@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS articles (
   category_label VARCHAR(100) NOT NULL,
   featured BOOLEAN DEFAULT FALSE,
   hidden BOOLEAN DEFAULT FALSE,
+  image_url VARCHAR(500) DEFAULT '',
   read_time INTEGER DEFAULT 3,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

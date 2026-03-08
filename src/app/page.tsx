@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { SectionHeading } from '@/components/SectionHeading';
 import { ArticleCard } from '@/components/ArticleCard';
@@ -10,8 +11,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const [articlesResult, featuredResult, quotesResult, consultationsResult] = await Promise.all([
-    pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, read_time as "readTime" FROM articles WHERE hidden = false ORDER BY created_at DESC LIMIT 7`),
-    pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, read_time as "readTime" FROM articles WHERE featured = true AND hidden = false ORDER BY created_at DESC LIMIT 3`),
+    pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, image_url as "imageUrl", read_time as "readTime" FROM articles WHERE hidden = false ORDER BY created_at DESC LIMIT 7`),
+    pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, image_url as "imageUrl", read_time as "readTime" FROM articles WHERE featured = true AND hidden = false ORDER BY created_at DESC LIMIT 3`),
     pool.query(`SELECT id, text FROM quotes WHERE hidden = false ORDER BY created_at ASC LIMIT 6`),
     pool.query(`SELECT id, type as category, text as question, answer FROM consultations WHERE status = 'archived' AND answer != '' ORDER BY created_at DESC LIMIT 3`),
   ]);
@@ -80,10 +81,10 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
-              { value: '١٢+', label: 'مقال متخصص' },
-              { value: '١٣+', label: 'استشارة منشورة' },
-              { value: '٧+', label: 'شهادات وتدريب' },
-              { value: '٨+', label: 'دورات تدريبية' },
+              { value: '+20', label: 'سنة خبرة' },
+              { value: '+350', label: 'مقال متخصص' },
+              { value: '+200', label: 'استشارة' },
+              { value: '+5000', label: 'مستفيد' },
             ].map((stat, i) => (
               <div key={i}>
                 <div className="text-2xl font-bold text-bronze">
@@ -279,15 +280,14 @@ export default async function Home() {
       <section className="py-16 sm:py-20 bg-charcoal text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-            <div className="shrink-0 w-56 h-72 rounded-2xl bg-gradient-to-br from-bronze to-bronze-light shadow-2xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-white/90 text-sm mb-2">كتاب</div>
-                <div className="text-white text-3xl font-bold">إشراقة</div>
-                <div className="mt-4 w-12 h-0.5 bg-white/30 mx-auto" />
-                <div className="text-white/70 text-xs mt-3">
-                  رانية طه الودية
-                </div>
-              </div>
+            <div className="shrink-0">
+              <Image
+                src="/book-cover.jpg"
+                alt="كتاب إشراقة - رانية طه الودية"
+                width={224}
+                height={288}
+                className="rounded-2xl shadow-2xl"
+              />
             </div>
             <div className="flex-1 text-center lg:text-right">
               <span className="inline-block px-3 py-1 text-xs font-medium text-bronze-light bg-bronze-light/10 rounded-full mb-4">
