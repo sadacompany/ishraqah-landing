@@ -14,7 +14,6 @@ export const siteConfig = {
   },
   nav: [
     { label: 'الرئيسية', href: '/' },
-    { label: 'من نحن', href: '/about' },
     { label: 'السيرة الذاتية', href: '/cv' },
     { label: 'المقالات', href: '/articles' },
     {
@@ -26,9 +25,7 @@ export const siteConfig = {
         { label: 'أرشيف الاستشارات', href: '/consultations/archive' },
       ],
     },
-    { label: 'اختبر نفسك', href: '/self-test' },
     { label: 'المؤلفات', href: '/books' },
-    { label: 'الفيديو', href: '/videos' },
     { label: 'بصمة الزوار', href: '/guestbook' },
   ],
 };
