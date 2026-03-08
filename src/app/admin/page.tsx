@@ -1,21 +1,20 @@
 'use client';
 
-import { useStore } from '@/lib/hooks/useStore';
+import { useConsultations } from '@/lib/hooks/useConsultations';
+import { useQuizResults } from '@/lib/hooks/useQuizResults';
+import { useGuestbook } from '@/lib/hooks/useGuestbook';
+import { useArticles } from '@/lib/hooks/useArticles';
+import { useQuotes } from '@/lib/hooks/useQuotes';
 import { StatsCard } from '@/components/admin/StatsCard';
 import { StatusBadge } from '@/components/admin/StatusBadge';
-import type { ConsultationRequest, QuizSubmission, GuestbookEntry, StoredArticle, StoredQuote } from '@/lib/types';
-import { articles } from '@/data/articles';
-import { quotes } from '@/data/quotes';
 
 export default function AdminDashboard() {
-  const { items: consultations } = useStore<ConsultationRequest>('consultations');
-  const { items: quizResults } = useStore<QuizSubmission>('quizResults');
-  const { items: guestbookEntries } = useStore<GuestbookEntry>('guestbook');
-  const { items: localArticles } = useStore<StoredArticle>('articles');
-  const { items: localQuotes } = useStore<StoredQuote>('quotes');
+  const { items: consultations } = useConsultations();
+  const { items: quizResults } = useQuizResults();
+  const { items: guestbookEntries } = useGuestbook();
+  const { articles } = useArticles();
+  const { quotes } = useQuotes();
 
-  const totalArticles = articles.length + localArticles.length;
-  const totalQuotes = quotes.length + localQuotes.length;
   const pendingGuestbook = guestbookEntries.filter((e) => e.status === 'pending').length;
   const pendingConsultations = consultations.filter((c) => c.status === 'pending').length;
 
@@ -45,7 +44,7 @@ export default function AdminDashboard() {
         />
         <StatsCard
           title="المقالات"
-          value={totalArticles}
+          value={articles.length}
           icon="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
           color="bronze"
         />
@@ -112,7 +111,7 @@ export default function AdminDashboard() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-cream-dark/30 p-4 text-center">
-          <p className="text-2xl font-bold text-charcoal">{totalQuotes}</p>
+          <p className="text-2xl font-bold text-charcoal">{quotes.length}</p>
           <p className="text-xs text-charcoal-light">اقتباس</p>
         </div>
         <div className="bg-white rounded-xl border border-cream-dark/30 p-4 text-center">

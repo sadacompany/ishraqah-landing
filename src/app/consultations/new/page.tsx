@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { addItem, generateId } from '@/lib/store';
-import type { ConsultationRequest } from '@/lib/types';
+import { generateId } from '@/lib/store';
+import { apiPost } from '@/lib/api-client';
 
 export default function NewConsultationPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -12,24 +12,20 @@ export default function NewConsultationPage() {
   const [email, setEmail] = useState('');
   const [type, setType] = useState('');
   const [text, setText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const id = generateId();
-    const request: ConsultationRequest = {
-      id,
-      name,
-      email,
-      type,
-      text,
-      status: 'pending',
-      answer: '',
-      createdAt: new Date().toISOString(),
-      answeredAt: null,
-    };
-    addItem('consultations', request);
-    setConsultationId(id);
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      const id = generateId();
+      await apiPost('/api/consultations', { id, name, email, type, text });
+      setConsultationId(id);
+      setSubmitted(true);
+    } catch {
+      alert('حدث خطأ. حاول مرة أخرى.');
+    }
+    setSubmitting(false);
   };
 
   if (submitted) {
@@ -174,9 +170,10 @@ export default function NewConsultationPage() {
 
           <button
             type="submit"
-            className="w-full px-6 py-3 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors"
+            disabled={submitting}
+            className="w-full px-6 py-3 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50"
           >
-            إرسال الاستشارة
+            {submitting ? 'جاري الإرسال...' : 'إرسال الاستشارة'}
           </button>
         </form>
       </div>

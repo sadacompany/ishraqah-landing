@@ -1,8 +1,6 @@
 import Link from 'next/link';
-import type { Article } from '@/data/articles';
-
 interface ArticleCardProps {
-  article: Article;
+  article: { id: string; slug: string; title: string; excerpt?: string; category?: string; categoryLabel?: string; featured?: boolean; readTime?: number };
   variant?: 'default' | 'featured' | 'compact';
 }
 

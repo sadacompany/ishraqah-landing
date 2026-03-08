@@ -1,17 +1,39 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { articles, getArticleBySlug } from '@/data/articles';
 import { ArticleCard } from '@/components/ArticleCard';
 import { ArticleJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd';
+import pool from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
+async function getArticle(slug: string) {
+  const result = await pool.query(
+    `SELECT id, slug, title, excerpt, content, category, category_label as "categoryLabel",
+            featured, hidden, read_time as "readTime"
+     FROM articles WHERE slug = $1`,
+    [slug]
+  );
+  return result.rows[0] || null;
+}
+
+async function getRelatedArticles(category: string, excludeId: string) {
+  const result = await pool.query(
+    `SELECT id, slug, title, excerpt, category, category_label as "categoryLabel",
+            featured, read_time as "readTime"
+     FROM articles WHERE category = $1 AND id != $2 AND hidden = false LIMIT 3`,
+    [category, excludeId]
+  );
+  return result.rows;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getArticle(slug);
   if (!article) return {};
   return {
     title: article.title,
@@ -24,18 +46,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return articles.map((article) => ({ slug: article.slug }));
-}
-
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
-  if (!article) notFound();
+  const article = await getArticle(slug);
+  if (!article || article.hidden) notFound();
 
-  const relatedArticles = articles
-    .filter((a) => a.category === article.category && a.id !== article.id)
-    .slice(0, 3);
+  const relatedArticles = await getRelatedArticles(article.category, article.id);
 
   const paragraphs = article.content.split('\n\n');
 
@@ -82,7 +98,7 @@ export default async function ArticlePage({ params }: Props) {
       </header>
 
       <div className="article-content text-charcoal-light text-base sm:text-lg leading-[2]">
-        {paragraphs.map((p, i) => {
+        {paragraphs.map((p: string, i: number) => {
           if (p.startsWith('**') && p.endsWith('**')) {
             return (
               <h2

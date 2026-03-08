@@ -1,26 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useStore } from '@/lib/hooks/useStore';
+import { useQuotes } from '@/lib/hooks/useQuotes';
 import { Modal } from '@/components/admin/Modal';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
-import { quotes as staticQuotes } from '@/data/quotes';
 import { generateId } from '@/lib/store';
 import type { StoredQuote } from '@/lib/types';
 
 export default function AdminQuotesPage() {
-  const { items: localQuotes, add, update, remove } = useStore<StoredQuote>('quotes');
+  const { quotes, add, update, remove } = useQuotes();
   const [editing, setEditing] = useState<StoredQuote | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const allQuotes = [
-    ...staticQuotes.map((q) => ({ ...q, source: 'static' as const })),
-    ...localQuotes,
-  ];
-
   const openNew = () => {
-    setEditing({ id: '', text: '', source: 'local' });
+    setEditing({ id: '', text: '', hidden: false });
     setIsNew(true);
   };
 
@@ -29,20 +23,31 @@ export default function AdminQuotesPage() {
     setIsNew(false);
   };
 
-  const save = () => {
+  const save = async () => {
     if (!editing) return;
     if (isNew) {
-      add({ ...editing, id: generateId(), source: 'local' });
+      await add({ ...editing, id: generateId() });
     } else {
-      update(editing.id, editing);
+      await update(editing.id, { text: editing.text });
     }
     setEditing(null);
+  };
+
+  const toggleHidden = async (q: StoredQuote) => {
+    await update(q.id, { hidden: !q.hidden } as Partial<StoredQuote>);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-charcoal-light">{allQuotes.length} اقتباس</p>
+        <p className="text-sm text-charcoal-light">
+          {quotes.length} اقتباس
+          {quotes.filter(q => q.hidden).length > 0 && (
+            <span className="text-charcoal-light/60 mr-1">
+              ({quotes.filter(q => q.hidden).length} مخفي)
+            </span>
+          )}
+        </p>
         <button
           onClick={openNew}
           className="px-4 py-2 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors"
@@ -52,29 +57,37 @@ export default function AdminQuotesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {allQuotes.map((q) => (
-          <div key={q.id} className="bg-white rounded-xl border border-cream-dark/30 p-4">
-            <p className="text-sm text-charcoal leading-relaxed mb-3">❝ {q.text}</p>
-            <div className="flex items-center justify-between">
-              <span className={`text-xs ${q.source === 'static' ? 'text-teal' : 'text-bronze'}`}>
-                {q.source === 'static' ? 'ثابت' : 'محلي'}
-              </span>
-              {q.source === 'local' && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => openEdit(q as StoredQuote)}
-                    className="text-xs px-2 py-1 bg-cream-warm text-charcoal rounded hover:bg-cream-dark transition-colors"
-                  >
-                    تعديل
-                  </button>
-                  <button
-                    onClick={() => setDeleteId(q.id)}
-                    className="text-xs px-2 py-1 text-red-500 hover:bg-red-50 rounded transition-colors"
-                  >
-                    حذف
-                  </button>
-                </div>
+        {quotes.map((q) => (
+          <div key={q.id} className={`bg-white rounded-xl border border-cream-dark/30 p-4 ${q.hidden ? 'opacity-50' : ''}`}>
+            <div className="flex items-start gap-2 mb-3">
+              <p className="text-sm text-charcoal leading-relaxed flex-1">{q.text}</p>
+              {q.hidden && (
+                <span className="shrink-0 text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full">مخفي</span>
               )}
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => toggleHidden(q)}
+                className={`text-xs px-2 py-1 rounded transition-colors ${
+                  q.hidden
+                    ? 'bg-green-50 text-green-600 hover:bg-green-100'
+                    : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
+                }`}
+              >
+                {q.hidden ? 'إظهار' : 'إخفاء'}
+              </button>
+              <button
+                onClick={() => openEdit(q)}
+                className="text-xs px-2 py-1 bg-cream-warm text-charcoal rounded hover:bg-cream-dark transition-colors"
+              >
+                تعديل
+              </button>
+              <button
+                onClick={() => setDeleteId(q.id)}
+                className="text-xs px-2 py-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+              >
+                حذف
+              </button>
             </div>
           </div>
         ))}
@@ -106,7 +119,7 @@ export default function AdminQuotesPage() {
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
-        onConfirm={() => { if (deleteId) { remove(deleteId); setDeleteId(null); } }}
+        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
         title="حذف الاقتباس"
         message="هل أنت متأكد من حذف هذا الاقتباس؟"
       />

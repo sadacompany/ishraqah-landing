@@ -1,7 +1,5 @@
-import type { Quote } from '@/data/quotes';
-
 interface QuoteCardProps {
-  quote: Quote;
+  quote: { id: string; text: string };
 }
 
 export function QuoteCard({ quote }: QuoteCardProps) {

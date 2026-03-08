@@ -1,44 +1,62 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getAll, setAll, addItem, updateItem, removeItem, type StoreKey } from '../store';
+import { apiFetch } from '../api-client';
 
-export function useStore<T extends { id: string }>(key: StoreKey) {
+export function useApiResource<T extends { id: string }>(endpoint: string) {
   const [items, setItems] = useState<T[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    setItems(getAll<T>(key));
-  }, [key]);
+  const refresh = useCallback(async () => {
+    try {
+      const data = await apiFetch<T[]>(endpoint);
+      setItems(data);
+    } catch {
+      // API might not be available yet
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint]);
 
   useEffect(() => {
     refresh();
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail.key === key || detail.key === 'all') refresh();
-    };
-    window.addEventListener('store-change', handler);
-    return () => window.removeEventListener('store-change', handler);
-  }, [key, refresh]);
+  }, [refresh]);
 
-  const add = useCallback((item: T) => {
-    addItem(key, item);
-    refresh();
-  }, [key, refresh]);
+  const add = useCallback(async (item: Partial<T>) => {
+    try {
+      await apiFetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify(item),
+      });
+      await refresh();
+    } catch (err) {
+      console.error('Failed to add item:', err);
+      throw err;
+    }
+  }, [endpoint, refresh]);
 
-  const update = useCallback((id: string, updates: Partial<T>) => {
-    updateItem<T>(key, id, updates);
-    refresh();
-  }, [key, refresh]);
+  const update = useCallback(async (id: string, updates: Partial<T>) => {
+    try {
+      await apiFetch(`${endpoint}/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates),
+      });
+      await refresh();
+    } catch (err) {
+      console.error('Failed to update item:', err);
+      throw err;
+    }
+  }, [endpoint, refresh]);
 
-  const remove = useCallback((id: string) => {
-    removeItem<T>(key, id);
-    refresh();
-  }, [key, refresh]);
+  const remove = useCallback(async (id: string) => {
+    try {
+      await apiFetch(`${endpoint}/${id}`, { method: 'DELETE' });
+      await refresh();
+    } catch (err) {
+      console.error('Failed to remove item:', err);
+      throw err;
+    }
+  }, [endpoint, refresh]);
 
-  const replace = useCallback((newItems: T[]) => {
-    setAll(key, newItems);
-    refresh();
-  }, [key, refresh]);
-
-  return { items, add, update, remove, replace, refresh };
+  return { items, loading, add, update, remove, refresh };
 }

@@ -2,8 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { exportAllData, importAllData, clearAllData } from '@/lib/store';
-import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { apiGet, apiPost } from '@/lib/api-client';
 
 export default function AdminSettingsPage() {
   const { changePassword } = useAuth();
@@ -12,7 +11,6 @@ export default function AdminSettingsPage() {
   const [confirmPw, setConfirmPw] = useState('');
   const [pwMsg, setPwMsg] = useState('');
   const [pwError, setPwError] = useState(false);
-  const [showClear, setShowClear] = useState(false);
   const [importMsg, setImportMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -42,24 +40,30 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handleExport = () => {
-    const data = exportAllData();
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ishraqah-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleExport = async () => {
+    try {
+      const data = await apiGet('/api/settings/export');
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ishraqah-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('فشل تصدير البيانات');
+    }
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
-        importAllData(reader.result as string);
+        const data = JSON.parse(reader.result as string);
+        await apiPost('/api/settings/import', data);
         setImportMsg('تم استيراد البيانات بنجاح');
       } catch {
         setImportMsg('فشل استيراد البيانات. تأكد من صحة الملف.');
@@ -132,30 +136,10 @@ export default function AdminSettingsPage() {
           </div>
           {importMsg && <p className="text-xs text-teal">{importMsg}</p>}
           <p className="text-xs text-charcoal-light">
-            تصدير البيانات يحفظ جميع الاستشارات ونتائج الاختبار ورسائل الزوار والمقالات والاقتباسات المضافة.
+            تصدير البيانات يحفظ جميع الاستشارات ونتائج الاختبار ورسائل الزوار والمقالات والاقتباسات.
           </p>
         </div>
       </div>
-
-      {/* Clear Data */}
-      <div className="bg-white rounded-xl border border-red-200 p-5">
-        <h3 className="text-sm font-bold text-red-600 mb-2">منطقة الخطر</h3>
-        <p className="text-xs text-charcoal-light mb-3">حذف جميع البيانات المحلية (الاستشارات، نتائج الاختبار، رسائل الزوار، المقالات والاقتباسات المضافة). لا يمكن التراجع.</p>
-        <button
-          onClick={() => setShowClear(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors"
-        >
-          حذف جميع البيانات
-        </button>
-      </div>
-
-      <ConfirmDialog
-        open={showClear}
-        onClose={() => setShowClear(false)}
-        onConfirm={() => { clearAllData(); setShowClear(false); }}
-        title="حذف جميع البيانات"
-        message="سيتم حذف جميع البيانات المحلية نهائياً. هل أنت متأكد؟"
-      />
     </div>
   );
 }

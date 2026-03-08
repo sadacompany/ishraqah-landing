@@ -2,60 +2,36 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { addItem, getAll, generateId } from '@/lib/store';
+import { generateId } from '@/lib/store';
+import { apiGet, apiPost } from '@/lib/api-client';
 import type { GuestbookEntry } from '@/lib/types';
-
-const staticMessages = [
-  {
-    id: 'static-1',
-    name: 'زائرة',
-    message:
-      'موقع رائع ومفيد جداً. استفدت كثيراً من المقالات التربوية. جزاكم الله خيراً.',
-  },
-  {
-    id: 'static-2',
-    name: 'أم محمد',
-    message:
-      'شكراً على المحتوى القيم. مقال تربية خمس نجوم ساعدني كثيراً في التعامل مع أطفالي.',
-  },
-  {
-    id: 'static-3',
-    name: 'باحثة نفسية',
-    message:
-      'محتوى علمي ممتاز ومبسط في نفس الوقت. أتمنى المزيد من المقالات في مجال الصحة النفسية.',
-  },
-];
 
 export default function GuestbookPage() {
   const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const [approvedEntries, setApprovedEntries] = useState<GuestbookEntry[]>([]);
+  const [entries, setEntries] = useState<GuestbookEntry[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const entries = getAll<GuestbookEntry>('guestbook');
-    setApprovedEntries(entries.filter((e) => e.status === 'approved'));
+    apiGet<GuestbookEntry[]>('/api/guestbook')
+      .then(setEntries)
+      .catch(() => {});
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const entry: GuestbookEntry = {
-      id: generateId(),
-      name,
-      message,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    };
-    addItem('guestbook', entry);
-    setSubmitted(true);
-    setName('');
-    setMessage('');
+    setSubmitting(true);
+    try {
+      await apiPost('/api/guestbook', { id: generateId(), name, message });
+      setSubmitted(true);
+      setName('');
+      setMessage('');
+    } catch {
+      alert('حدث خطأ. حاول مرة أخرى.');
+    }
+    setSubmitting(false);
   };
-
-  const allMessages = [
-    ...staticMessages,
-    ...approvedEntries.map((e) => ({ id: e.id, name: e.name, message: e.message })),
-  ];
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -79,7 +55,7 @@ export default function GuestbookPage() {
 
       {/* Existing Messages */}
       <div className="space-y-4 mb-10">
-        {allMessages.map((msg) => (
+        {entries.map((msg) => (
           <div
             key={msg.id}
             className="bg-white rounded-2xl p-6 border border-cream-dark/30"
@@ -158,9 +134,10 @@ export default function GuestbookPage() {
             </div>
             <button
               type="submit"
-              className="px-6 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors"
+              disabled={submitting}
+              className="px-6 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50"
             >
-              إرسال
+              {submitting ? 'جاري الإرسال...' : 'إرسال'}
             </button>
           </form>
         )}

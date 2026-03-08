@@ -76,6 +76,25 @@ export default function RootLayout({
         <OrganizationJsonLd />
         <WebsiteJsonLd />
         <LayoutShell>{children}</LayoutShell>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var start = Date.now();
+                window.addEventListener('beforeunload', function() {
+                  var duration = Math.round((Date.now() - start) / 1000);
+                  if (duration > 0 && navigator.sendBeacon) {
+                    navigator.sendBeacon('/api/analytics/track', JSON.stringify({
+                      path: location.pathname,
+                      durationSeconds: duration,
+                      sessionId: '',
+                    }));
+                  }
+                });
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   );

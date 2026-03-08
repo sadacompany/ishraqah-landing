@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useStore } from '@/lib/hooks/useStore';
+import { useConsultations } from '@/lib/hooks/useConsultations';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { Modal } from '@/components/admin/Modal';
@@ -9,7 +9,7 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import type { ConsultationRequest } from '@/lib/types';
 
 export default function AdminConsultationsPage() {
-  const { items, update, remove } = useStore<ConsultationRequest>('consultations');
+  const { items, update, remove } = useConsultations();
   const [selected, setSelected] = useState<ConsultationRequest | null>(null);
   const [answer, setAnswer] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -23,19 +23,15 @@ export default function AdminConsultationsPage() {
     setAnswer(c.answer || '');
   };
 
-  const submitAnswer = () => {
+  const submitAnswer = async () => {
     if (!selected) return;
-    update(selected.id, {
-      answer,
-      status: 'answered',
-      answeredAt: new Date().toISOString(),
-    });
+    await update(selected.id, { answer, status: 'answered' });
     setSelected(null);
     setAnswer('');
   };
 
-  const archive = (id: string) => {
-    update(id, { status: 'archived' });
+  const archive = async (id: string) => {
+    await update(id, { status: 'archived' });
   };
 
   return (
@@ -147,7 +143,7 @@ export default function AdminConsultationsPage() {
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
-        onConfirm={() => { if (deleteId) { remove(deleteId); setDeleteId(null); } }}
+        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
         title="حذف الاستشارة"
         message="هل أنت متأكد من حذف هذه الاستشارة؟ لا يمكن التراجع عن هذا الإجراء."
       />

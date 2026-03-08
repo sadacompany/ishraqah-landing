@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useStore } from '@/lib/hooks/useStore';
+import { useGuestbook } from '@/lib/hooks/useGuestbook';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
-import type { GuestbookEntry } from '@/lib/types';
 
 export default function AdminGuestbookPage() {
-  const { items, update, remove } = useStore<GuestbookEntry>('guestbook');
+  const { items, update, remove } = useGuestbook();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
 
@@ -99,7 +98,7 @@ export default function AdminGuestbookPage() {
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
-        onConfirm={() => { if (deleteId) { remove(deleteId); setDeleteId(null); } }}
+        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
         title="حذف الرسالة"
         message="هل أنت متأكد من حذف هذه الرسالة؟"
       />

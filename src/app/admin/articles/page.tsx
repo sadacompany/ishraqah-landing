@@ -1,15 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { useStore } from '@/lib/hooks/useStore';
+import { useArticles } from '@/lib/hooks/useArticles';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { Modal } from '@/components/admin/Modal';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
-import { articles as staticArticles, categoryLabels } from '@/data/articles';
 import { generateId } from '@/lib/store';
 import type { StoredArticle } from '@/lib/types';
 
-const emptyArticle: Omit<StoredArticle, 'id' | 'source'> = {
+const categoryLabels: Record<string, string> = {
+  psychology: 'علم النفس',
+  parenting: 'التربية',
+  relationships: 'العلاقات الزوجية',
+  'self-development': 'تطوير الذات',
+};
+
+const emptyArticle: Omit<StoredArticle, 'id'> = {
   slug: '',
   title: '',
   excerpt: '',
@@ -17,22 +23,18 @@ const emptyArticle: Omit<StoredArticle, 'id' | 'source'> = {
   category: 'psychology',
   categoryLabel: 'علم النفس',
   featured: false,
+  hidden: false,
   readTime: 3,
 };
 
 export default function AdminArticlesPage() {
-  const { items: localArticles, add, update, remove } = useStore<StoredArticle>('articles');
+  const { articles, add, update, remove } = useArticles();
   const [editing, setEditing] = useState<StoredArticle | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const allArticles = [
-    ...staticArticles.map((a) => ({ ...a, source: 'static' as const })),
-    ...localArticles,
-  ];
-
   const openNew = () => {
-    setEditing({ ...emptyArticle, id: '', source: 'local' });
+    setEditing({ ...emptyArticle, id: '' });
     setIsNew(true);
   };
 
@@ -41,25 +43,35 @@ export default function AdminArticlesPage() {
     setIsNew(false);
   };
 
-  const save = () => {
+  const save = async () => {
     if (!editing) return;
     if (isNew) {
-      add({
+      await add({
         ...editing,
         id: generateId(),
         slug: editing.slug || editing.title.replace(/\s+/g, '-').toLowerCase(),
-        source: 'local',
       });
     } else {
-      update(editing.id, editing);
+      await update(editing.id, editing);
     }
     setEditing(null);
+  };
+
+  const toggleHidden = async (a: StoredArticle) => {
+    await update(a.id, { hidden: !a.hidden } as Partial<StoredArticle>);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-charcoal-light">{allArticles.length} مقال</p>
+        <p className="text-sm text-charcoal-light">
+          {articles.length} مقال
+          {articles.filter(a => a.hidden).length > 0 && (
+            <span className="text-charcoal-light/60 mr-1">
+              ({articles.filter(a => a.hidden).length} مخفي)
+            </span>
+          )}
+        </p>
         <button
           onClick={openNew}
           className="px-4 py-2 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors"
@@ -68,41 +80,54 @@ export default function AdminArticlesPage() {
         </button>
       </div>
 
-      {allArticles.length === 0 ? (
+      {articles.length === 0 ? (
         <EmptyState title="لا توجد مقالات" description="أضف مقالاً جديداً من الزر أعلاه" />
       ) : (
         <div className="space-y-3">
-          {allArticles.map((a) => (
-            <div key={a.id} className="bg-white rounded-xl border border-cream-dark/30 p-4 flex items-center justify-between">
+          {articles.map((a) => (
+            <div
+              key={a.id}
+              className={`bg-white rounded-xl border border-cream-dark/30 p-4 flex items-center justify-between ${a.hidden ? 'opacity-50' : ''}`}
+            >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-sm font-medium text-charcoal truncate">{a.title}</h3>
                   {a.featured && (
                     <span className="text-xs bg-bronze-glow/30 text-bronze px-2 py-0.5 rounded-full">مميز</span>
                   )}
+                  {a.hidden && (
+                    <span className="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full">مخفي</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-xs text-charcoal-light">
                   <span className="bg-cream-warm px-2 py-0.5 rounded">{a.categoryLabel}</span>
                   <span>{a.readTime} دقائق</span>
-                  <span className={a.source === 'static' ? 'text-teal' : 'text-bronze'}>{a.source === 'static' ? 'ثابت' : 'محلي'}</span>
                 </div>
               </div>
-              {a.source === 'local' && (
-                <div className="flex items-center gap-2 mr-4">
-                  <button
-                    onClick={() => openEdit(a as StoredArticle)}
-                    className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors"
-                  >
-                    تعديل
-                  </button>
-                  <button
-                    onClick={() => setDeleteId(a.id)}
-                    className="text-xs px-2 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    حذف
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-2 mr-4">
+                <button
+                  onClick={() => toggleHidden(a)}
+                  className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
+                    a.hidden
+                      ? 'bg-green-50 text-green-600 hover:bg-green-100'
+                      : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
+                  }`}
+                >
+                  {a.hidden ? 'إظهار' : 'إخفاء'}
+                </button>
+                <button
+                  onClick={() => openEdit(a)}
+                  className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors"
+                >
+                  تعديل
+                </button>
+                <button
+                  onClick={() => setDeleteId(a.id)}
+                  className="text-xs px-2 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  حذف
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -201,7 +226,7 @@ export default function AdminArticlesPage() {
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
-        onConfirm={() => { if (deleteId) { remove(deleteId); setDeleteId(null); } }}
+        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
         title="حذف المقال"
         message="هل أنت متأكد من حذف هذا المقال؟"
       />

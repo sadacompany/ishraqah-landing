@@ -2,29 +2,25 @@
 
 import Link from 'next/link';
 import { ConsultationCard } from '@/components/ConsultationCard';
-import { consultations as staticConsultations } from '@/data/consultations';
-import { getAll } from '@/lib/store';
 import { useState, useEffect } from 'react';
-import type { ConsultationRequest } from '@/lib/types';
+import { apiGet } from '@/lib/api-client';
+
+interface ArchiveConsultation {
+  id: string;
+  title: string;
+  question: string;
+  answer: string;
+  category: string;
+}
 
 export default function ConsultationArchivePage() {
-  const [archivedConsultations, setArchivedConsultations] = useState<Array<{ id: string; title: string; question: string; answer: string; category: string }>>([]);
+  const [consultations, setConsultations] = useState<ArchiveConsultation[]>([]);
 
   useEffect(() => {
-    const stored = getAll<ConsultationRequest>('consultations');
-    const archived = stored
-      .filter((c) => c.status === 'archived' && c.answer)
-      .map((c) => ({
-        id: c.id,
-        title: c.type || 'استشارة',
-        question: c.text,
-        answer: c.answer,
-        category: c.type || 'عامة',
-      }));
-    setArchivedConsultations(archived);
+    apiGet<ArchiveConsultation[]>('/api/consultations/archive')
+      .then(setConsultations)
+      .catch(() => {});
   }, []);
-
-  const allConsultations = [...staticConsultations, ...archivedConsultations];
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -55,7 +51,7 @@ export default function ConsultationArchivePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {allConsultations.map((c) => (
+        {consultations.map((c) => (
           <ConsultationCard key={c.id} consultation={c} />
         ))}
       </div>

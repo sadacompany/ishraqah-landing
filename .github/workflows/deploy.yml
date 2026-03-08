@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build static site
+      - name: Build application
         run: npm run build
 
       - name: Setup SSH key
@@ -33,6 +33,18 @@ jobs:
       - name: Deploy to server
         run: |
           rsync -avz --delete \
+            --exclude='.env.local' \
+            --exclude='node_modules' \
+            --exclude='.git' \
             -e "ssh -i ~/.ssh/deploy_key" \
-            out/ \
+            ./ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/ishraqah/
+
+      - name: Install dependencies and restart
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            cd /var/www/ishraqah
+            npm ci --production
+            npx pm2 restart ishraqah || npx pm2 start npm --name ishraqah -- start
+            npx pm2 save
+          EOF

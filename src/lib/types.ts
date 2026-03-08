@@ -15,6 +15,9 @@ export interface QuizSubmission {
   answers: number[];
   totalScore: number;
   resultTitle: string;
+  ipAddress?: string;
+  userAgent?: string;
+  country?: string;
   createdAt: string;
 }
 
@@ -35,17 +38,36 @@ export interface StoredArticle {
   category: 'psychology' | 'parenting' | 'relationships' | 'self-development';
   categoryLabel: string;
   featured: boolean;
+  hidden: boolean;
   readTime: number;
-  source: 'static' | 'local';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface StoredQuote {
   id: string;
   text: string;
-  source: 'static' | 'local';
+  hidden: boolean;
+  createdAt?: string;
 }
 
-export interface AdminSettings {
-  passwordHash: string;
-  setupComplete: boolean;
+export interface PageView {
+  id: number;
+  path: string;
+  ipAddress: string;
+  userAgent: string;
+  country: string;
+  referrer: string;
+  sessionId: string;
+  durationSeconds: number;
+  createdAt: string;
+}
+
+export interface AnalyticsSummary {
+  totalViews: number;
+  uniqueVisitors: number;
+  topPages: { path: string; views: number }[];
+  topCountries: { country: string; views: number }[];
+  dailyViews: { date: string; views: number }[];
+  recentVisitors: PageView[];
 }

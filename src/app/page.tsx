@@ -4,13 +4,28 @@ import { ArticleCard } from '@/components/ArticleCard';
 import { QuoteCard } from '@/components/QuoteCard';
 import { FounderBio } from '@/components/FounderBio';
 import { ConsultationCard } from '@/components/ConsultationCard';
-import { getFeaturedArticles, articles } from '@/data/articles';
-import { quotes } from '@/data/quotes';
-import { consultations } from '@/data/consultations';
+import pool from '@/lib/db';
 
-export default function Home() {
-  const featuredArticles = getFeaturedArticles();
-  const selectedQuotes = quotes.slice(0, 6);
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const [articlesResult, featuredResult, quotesResult, consultationsResult] = await Promise.all([
+    pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, read_time as "readTime" FROM articles WHERE hidden = false ORDER BY created_at DESC LIMIT 7`),
+    pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, read_time as "readTime" FROM articles WHERE featured = true AND hidden = false ORDER BY created_at DESC LIMIT 3`),
+    pool.query(`SELECT id, text FROM quotes WHERE hidden = false ORDER BY created_at ASC LIMIT 6`),
+    pool.query(`SELECT id, type as category, text as question, answer FROM consultations WHERE status = 'archived' AND answer != '' ORDER BY created_at DESC LIMIT 3`),
+  ]);
+
+  const articles = articlesResult.rows;
+  const featuredArticles = featuredResult.rows;
+  const selectedQuotes = quotesResult.rows;
+  const consultations = consultationsResult.rows.map((c: { id: string; category: string; question: string; answer: string }) => ({
+    id: c.id,
+    title: c.category || 'استشارة',
+    question: c.question,
+    answer: c.answer,
+    category: c.category || 'عامة',
+  }));
 
   return (
     <>

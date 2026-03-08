@@ -1,13 +1,12 @@
 'use client';
 
-import { useStore } from '@/lib/hooks/useStore';
+import { useQuizResults } from '@/lib/hooks/useQuizResults';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { useState } from 'react';
-import type { QuizSubmission } from '@/lib/types';
 
 export default function AdminQuizPage() {
-  const { items, remove } = useStore<QuizSubmission>('quizResults');
+  const { items, remove } = useQuizResults();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const sorted = [...items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -61,22 +60,31 @@ export default function AdminQuizPage() {
           {sorted.map((q) => {
             const color = q.totalScore <= 6 ? 'emerald' : q.totalScore <= 13 ? 'amber' : q.totalScore <= 18 ? 'orange' : 'red';
             return (
-              <div key={q.id} className="bg-white rounded-xl border border-cream-dark/30 p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${color}-100`}>
-                    <span className={`text-sm font-bold text-${color}-600`}>{q.totalScore}</span>
+              <div key={q.id} className="bg-white rounded-xl border border-cream-dark/30 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${color}-100`}>
+                      <span className={`text-sm font-bold text-${color}-600`}>{q.totalScore}</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-charcoal">{q.resultTitle}</p>
+                      <p className="text-xs text-charcoal-light">{new Date(q.createdAt).toLocaleDateString('ar-SA')} · الدرجة: {q.totalScore}/24</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-charcoal">{q.resultTitle}</p>
-                    <p className="text-xs text-charcoal-light">{new Date(q.createdAt).toLocaleDateString('ar-SA')} · الدرجة: {q.totalScore}/24</p>
-                  </div>
+                  <button
+                    onClick={() => setDeleteId(q.id)}
+                    className="text-xs px-2 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    حذف
+                  </button>
                 </div>
-                <button
-                  onClick={() => setDeleteId(q.id)}
-                  className="text-xs px-2 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  حذف
-                </button>
+                {(q.ipAddress || q.country || q.userAgent) && (
+                  <div className="mt-3 pt-3 border-t border-cream-dark/20 text-xs text-charcoal-light space-y-1">
+                    {q.ipAddress && <p>IP: <span dir="ltr">{q.ipAddress}</span></p>}
+                    {q.country && <p>الدولة: {q.country}</p>}
+                    {q.userAgent && <p className="truncate">المتصفح: <span dir="ltr">{q.userAgent.slice(0, 80)}...</span></p>}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -86,7 +94,7 @@ export default function AdminQuizPage() {
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
-        onConfirm={() => { if (deleteId) { remove(deleteId); setDeleteId(null); } }}
+        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
         title="حذف النتيجة"
         message="هل أنت متأكد من حذف هذه النتيجة؟"
       />

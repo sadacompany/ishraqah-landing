@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArticleCard } from '@/components/ArticleCard';
-import { articles, categoryLabels } from '@/data/articles';
+import pool from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'المقالات',
@@ -9,7 +11,20 @@ export const metadata: Metadata = {
     'مقالات متخصصة في علم النفس والتربية والعلاقات الزوجية وتطوير الذات',
 };
 
-export default function ArticlesPage() {
+const categoryLabels: Record<string, string> = {
+  psychology: 'علم النفس',
+  parenting: 'التربية',
+  relationships: 'العلاقات الزوجية',
+  'self-development': 'تطوير الذات',
+};
+
+export default async function ArticlesPage() {
+  const result = await pool.query(
+    `SELECT id, slug, title, excerpt, category, category_label as "categoryLabel",
+            featured, read_time as "readTime"
+     FROM articles WHERE hidden = false ORDER BY created_at DESC`
+  );
+  const articles = result.rows;
   const categories = Object.entries(categoryLabels);
 
   return (
@@ -39,7 +54,7 @@ export default function ArticlesPage() {
           الكل ({articles.length})
         </span>
         {categories.map(([key, label]) => {
-          const count = articles.filter((a) => a.category === key).length;
+          const count = articles.filter((a: { category: string }) => a.category === key).length;
           return (
             <span
               key={key}
@@ -53,7 +68,7 @@ export default function ArticlesPage() {
 
       {/* Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articles.map((article) => (
+        {articles.map((article: { id: string; slug: string; title: string; excerpt: string; category: string; categoryLabel: string; featured: boolean; readTime: number }) => (
           <ArticleCard key={article.id} article={article} />
         ))}
       </div>

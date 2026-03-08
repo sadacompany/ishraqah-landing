@@ -1,7 +1,5 @@
-import type { Consultation } from '@/data/consultations';
-
 interface ConsultationCardProps {
-  consultation: Consultation;
+  consultation: { id: string; title: string; question: string; answer: string; category: string };
 }
 
 export function ConsultationCard({ consultation }: ConsultationCardProps) {

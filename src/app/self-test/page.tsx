@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { panicQuiz } from '@/data/quiz';
-import { addItem, generateId } from '@/lib/store';
-import type { QuizSubmission } from '@/lib/types';
+import { generateId } from '@/lib/store';
+import { apiPost } from '@/lib/api-client';
 
 export default function SelfTestPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -13,7 +13,7 @@ export default function SelfTestPage() {
 
   const totalQuestions = panicQuiz.questions.length;
 
-  const handleAnswer = (value: number) => {
+  const handleAnswer = async (value: number) => {
     const newAnswers = [...answers, value];
     setAnswers(newAnswers);
 
@@ -24,14 +24,16 @@ export default function SelfTestPage() {
       const resultObj = panicQuiz.results.find(
         (r) => totalScore >= r.range[0] && totalScore <= r.range[1]
       );
-      const submission: QuizSubmission = {
-        id: generateId(),
-        answers: newAnswers,
-        totalScore,
-        resultTitle: resultObj?.title || '',
-        createdAt: new Date().toISOString(),
-      };
-      addItem('quizResults', submission);
+      try {
+        await apiPost('/api/quiz-results', {
+          id: generateId(),
+          answers: newAnswers,
+          totalScore,
+          resultTitle: resultObj?.title || '',
+        });
+      } catch {
+        // Best-effort tracking
+      }
       setShowResults(true);
     }
   };

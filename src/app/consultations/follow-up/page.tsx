@@ -2,23 +2,26 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { getAll } from '@/lib/store';
+import { apiGet } from '@/lib/api-client';
 import type { ConsultationRequest } from '@/lib/types';
 
 export default function FollowUpPage() {
   const [query, setQuery] = useState('');
-  const [result, setResult] = useState<ConsultationRequest | null>(null);
+  const [results, setResults] = useState<ConsultationRequest[]>([]);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    const consultations = getAll<ConsultationRequest>('consultations');
-    const found = consultations.find(
-      (c) => c.id === query.trim() || (c.email && c.email === query.trim())
-    );
-    setResult(found || null);
+    try {
+      const data = await apiGet<ConsultationRequest[]>(`/api/consultations/lookup?q=${encodeURIComponent(query.trim())}`);
+      setResults(data);
+    } catch {
+      setResults([]);
+    }
     setSearched(true);
   };
+
+  const result = results[0] || null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">

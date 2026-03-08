@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function AdminLoginPage() {
-  const { setupDone, login, setup, loading } = useAuth();
+  const { login, loading } = useAuth();
   const router = useRouter();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,26 +20,13 @@ export default function AdminLoginPage() {
     setSubmitting(true);
 
     try {
-      if (!setupDone) {
-        if (password.length < 6) {
-          setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-          setSubmitting(false);
-          return;
-        }
-        if (password !== confirmPassword) {
-          setError('كلمتا المرور غير متطابقتين');
-          setSubmitting(false);
-          return;
-        }
-        await setup(password);
+      const ok = await login(email, password);
+      if (ok) {
+        router.refresh();
         router.replace('/admin');
+        return;
       } else {
-        const ok = await login(password);
-        if (ok) {
-          router.replace('/admin');
-        } else {
-          setError('كلمة المرور غير صحيحة');
-        }
+        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
       }
     } catch {
       setError('حدث خطأ. حاول مرة أخرى.');
@@ -57,12 +44,22 @@ export default function AdminLoginPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-charcoal">إشراقة نفسية</h1>
-          <p className="text-sm text-charcoal-light mt-1">
-            {setupDone ? 'تسجيل الدخول للوحة التحكم' : 'إعداد كلمة المرور لأول مرة'}
-          </p>
+          <p className="text-sm text-charcoal-light mt-1">تسجيل الدخول للوحة التحكم</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 border border-cream-dark/30 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-2">البريد الإلكتروني</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 focus:border-bronze transition-colors"
+              placeholder="أدخل البريد الإلكتروني"
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-charcoal mb-2">كلمة المرور</label>
             <input
@@ -71,23 +68,9 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 focus:border-bronze transition-colors"
-              placeholder={setupDone ? 'أدخل كلمة المرور' : 'أنشئ كلمة مرور (6 أحرف على الأقل)'}
+              placeholder="أدخل كلمة المرور"
             />
           </div>
-
-          {!setupDone && (
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-2">تأكيد كلمة المرور</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 focus:border-bronze transition-colors"
-                placeholder="أعد إدخال كلمة المرور"
-              />
-            </div>
-          )}
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
@@ -98,7 +81,7 @@ export default function AdminLoginPage() {
             disabled={submitting}
             className="w-full px-6 py-3 text-sm font-medium text-white bg-charcoal hover:bg-charcoal-light rounded-xl transition-colors disabled:opacity-50"
           >
-            {submitting ? '...' : setupDone ? 'تسجيل الدخول' : 'إنشاء الحساب'}
+            {submitting ? '...' : 'تسجيل الدخول'}
           </button>
         </form>
       </div>
