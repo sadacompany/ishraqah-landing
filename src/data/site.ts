@@ -16,15 +16,6 @@ export const siteConfig = {
     { label: 'الرئيسية', href: '/' },
     { label: 'السيرة الذاتية', href: '/cv' },
     { label: 'المقالات', href: '/articles' },
-    {
-      label: 'الاستشارات',
-      href: '/consultations',
-      children: [
-        { label: 'استشارة جديدة', href: '/consultations/new' },
-        { label: 'متابعة استشارة', href: '/consultations/follow-up' },
-        { label: 'أرشيف الاستشارات', href: '/consultations/archive' },
-      ],
-    },
     { label: 'المؤلفات', href: '/books' },
     { label: 'بصمة الزوار', href: '/guestbook' },
   ],
