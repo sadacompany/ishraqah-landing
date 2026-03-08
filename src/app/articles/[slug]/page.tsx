@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { articles, getArticleBySlug } from '@/data/articles';
 import { ArticleCard } from '@/components/ArticleCard';
+import { ArticleJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -40,6 +41,19 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <ArticleJsonLd
+        title={article.title}
+        description={article.excerpt}
+        slug={article.slug}
+        readTime={article.readTime}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'الرئيسية', url: 'https://ishraqah.life' },
+          { name: 'المقالات', url: 'https://ishraqah.life/articles' },
+          { name: article.title, url: `https://ishraqah.life/articles/${article.slug}` },
+        ]}
+      />
       <nav className="text-sm text-charcoal-light mb-8">
         <Link href="/" className="hover:text-bronze transition-colors">
           الرئيسية

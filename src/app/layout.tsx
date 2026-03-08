@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Tajawal } from 'next/font/google';
 import './globals.css';
 import { LayoutShell } from '@/components/LayoutShell';
+import { OrganizationJsonLd, WebsiteJsonLd } from '@/components/JsonLd';
 
 const tajawal = Tajawal({
   subsets: ['arabic', 'latin'],
@@ -11,33 +12,57 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://ishraqah.life'),
   title: {
-    default: 'إشراقة نفسية | نشر الوعي النفسي والتربوي',
+    default: 'إشراقة نفسية | استشارات نفسية وتربوية ومقالات في الوعي النفسي',
     template: '%s | إشراقة نفسية',
   },
   description:
-    'إشراقة نفسية - منصة متخصصة في نشر الوعي النفسي والتربوي، تقدم استشارات نفسية ومقالات تربوية ومحتوى توعوي بإشراف الأستاذة رانية طه الودية',
+    'منصة إشراقة نفسية للاستشارات النفسية والتربوية. مقالات متخصصة في علم النفس، اختبارات نفسية مجانية، إرشاد أسري وتربوي بإشراف الأستاذة رانية طه الودية - مستشارة نفسية وتربوية',
   keywords: [
     'إشراقة نفسية',
     'استشارات نفسية',
-    'تربية',
+    'مستشارة نفسية',
     'علم النفس',
+    'تربية الأطفال',
+    'إرشاد أسري',
+    'الصحة النفسية',
+    'اختبار نوبات الهلع',
+    'القلق والتوتر',
+    'تطوير الذات',
     'رانية طه الودية',
     'وعي نفسي',
-    'تطوير ذات',
-    'إرشاد أسري',
+    'علاج القلق',
+    'مشاكل زوجية',
+    'تربية المراهقين',
   ],
+  alternates: {
+    canonical: 'https://ishraqah.life',
+  },
   openGraph: {
-    title: 'إشراقة نفسية',
-    description: 'نشر الوعي النفسي والتربوي من خلال الاستشارات والمؤلفات',
+    title: 'إشراقة نفسية - استشارات نفسية وتربوية',
+    description: 'منصة متخصصة في نشر الوعي النفسي والتربوي. استشارات نفسية، مقالات متخصصة، واختبارات نفسية مجانية',
     type: 'website',
     locale: 'ar_SA',
+    url: 'https://ishraqah.life',
     siteName: 'إشراقة نفسية',
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@Ranyah_alwadyah',
     creator: '@Ranyah_alwadyah',
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+    },
+  },
+  verification: {},
 };
 
 export default function RootLayout({
@@ -48,6 +73,8 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={tajawal.variable}>
       <body className={`${tajawal.className} min-h-screen flex flex-col`}>
+        <OrganizationJsonLd />
+        <WebsiteJsonLd />
         <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
