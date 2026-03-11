@@ -36,6 +36,17 @@ export const metadata: Metadata = {
     'مشاكل زوجية',
     'تربية المراهقين',
   ],
+  icons: {
+    icon: [
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+    other: [
+      { rel: 'mask-icon', url: '/icon.svg', color: '#8B6F4E' },
+    ],
+  },
+  manifest: '/site.webmanifest',
   alternates: {
     canonical: 'https://ishraqah.life',
   },
@@ -62,6 +73,10 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
     },
   },
+  other: {
+    'msapplication-TileColor': '#2C2825',
+    'msapplication-config': '/browserconfig.xml',
+  },
   verification: {},
 };
 
@@ -72,6 +87,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" className={tajawal.variable}>
+      <head>
+        <meta name="theme-color" content="#8B6F4E" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <body className={`${tajawal.className} min-h-screen flex flex-col`}>
         <OrganizationJsonLd />
         <WebsiteJsonLd />
