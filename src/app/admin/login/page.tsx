@@ -23,8 +23,7 @@ export default function AdminLoginPage() {
     try {
       const ok = await login(email, password);
       if (ok) {
-        router.refresh();
-        router.replace('/admin');
+        window.location.href = '/admin';
         return;
       } else {
         setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
