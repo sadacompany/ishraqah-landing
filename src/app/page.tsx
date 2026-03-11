@@ -37,11 +37,13 @@ export default async function Home() {
           <div className="max-w-3xl">
             <div className="animate-fade-in-up">
               <span className="inline-block px-3 py-1.5 text-xs font-medium text-bronze bg-bronze-glow/40 rounded-full mb-6">
-                إشراقة نفسية
+                إشراقة
               </span>
             </div>
             <h1 className="animate-fade-in-up-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-charcoal leading-[1.4] sm:leading-[1.35]">
-              <span className="text-bronze">إشراقة</span> لنشر الوعي النفسي والتربوي
+              <span className="text-bronze">إشراقة</span>
+              <br />
+              لتعزيز الوعي النفسي والتربوي
             </h1>
             <p className="animate-fade-in-up-delay-2 mt-6 text-lg text-charcoal-light leading-relaxed max-w-xl">
               منصة متخصصة تساعدك على فهم ذاتك وتحسين حياتك النفسية والتربوية
@@ -99,7 +101,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="عن المستشارة"
-            subtitle="رحلة متخصصة في نشر الوعي النفسي والتربوي"
+            subtitle="رحلة متخصصة في تعزيز الوعي النفسي والتربوي"
           />
           <div className="mt-8">
             <FounderBio variant="homepage" />

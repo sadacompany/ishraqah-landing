@@ -2,10 +2,10 @@ export function OrganizationJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'إشراقة نفسية',
+    name: 'إشراقة',
     alternateName: 'Ishraqah',
     url: 'https://ishraqah.life',
-    description: 'منصة متخصصة في نشر الوعي النفسي والتربوي',
+    description: 'منصة متخصصة في تعزيز الوعي النفسي والتربوي',
     founder: {
       '@type': 'Person',
       name: 'رانية طه الودية',
@@ -26,7 +26,7 @@ export function WebsiteJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'إشراقة نفسية',
+    name: 'إشراقة',
     url: 'https://ishraqah.life',
     inLanguage: 'ar',
     potentialAction: {
@@ -71,7 +71,7 @@ export function ArticleJsonLd({
     },
     publisher: {
       '@type': 'Organization',
-      name: 'إشراقة نفسية',
+      name: 'إشراقة',
       url: 'https://ishraqah.life',
     },
     datePublished: datePublished || '2024-01-01',

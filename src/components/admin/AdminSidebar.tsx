@@ -24,7 +24,7 @@ export function AdminSidebar() {
         <Link href="/admin" className="flex items-center gap-3">
           <Logo size={36} className="text-bronze-light" />
           <div>
-            <h1 className="text-lg font-bold text-bronze-light leading-tight">إشراقة نفسية</h1>
+            <h1 className="text-lg font-bold text-bronze-light leading-tight">إشراقة</h1>
             <p className="text-xs text-white/50">لوحة التحكم</p>
           </div>
         </Link>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     canonical: 'https://ishraqah.life/self-test',
   },
   openGraph: {
-    title: 'اختبار نوبات الهلع المجاني | إشراقة نفسية',
+    title: 'اختبار نوبات الهلع المجاني | إشراقة',
     description: 'اختبار ذاتي مجاني لتقييم أعراض نوبات الهلع والقلق. 8 أسئلة مع نتائج فورية',
     type: 'website',
   },

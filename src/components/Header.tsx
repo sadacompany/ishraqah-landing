@@ -17,10 +17,10 @@ export function Header() {
             <Logo size={40} className="text-bronze" />
             <div>
               <h1 className="text-lg font-bold text-charcoal leading-tight">
-                إشراقة نفسية
+                إشراقة
               </h1>
               <p className="text-[10px] text-charcoal-light hidden sm:block">
-                نشر الوعي النفسي والتربوي
+                تعزيز الوعي النفسي والتربوي
               </p>
             </div>
           </Link>
