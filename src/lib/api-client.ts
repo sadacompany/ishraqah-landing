@@ -26,3 +26,14 @@ export function apiPatch<T>(url: string, body: unknown) {
 export function apiDelete(url: string) {
   return apiFetch(url, { method: 'DELETE' });
 }
+
+export async function apiUpload(url: string, file: File): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(url, { method: 'POST', credentials: 'include', body: formData });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}

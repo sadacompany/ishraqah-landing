@@ -1,70 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useArticles } from '@/lib/hooks/useArticles';
 import { EmptyState } from '@/components/admin/EmptyState';
-import { Modal } from '@/components/admin/Modal';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
-import { generateId } from '@/lib/store';
 import type { StoredArticle } from '@/lib/types';
 
-const categoryLabels: Record<string, string> = {
-  psychology: 'علم النفس',
-  parenting: 'التربية',
-  relationships: 'العلاقات الزوجية',
-  'self-development': 'تطوير الذات',
-};
-
-const emptyArticle: Omit<StoredArticle, 'id'> = {
-  slug: '',
-  title: '',
-  excerpt: '',
-  content: '',
-  category: 'psychology',
-  categoryLabel: 'علم النفس',
-  featured: false,
-  hidden: false,
-  imageUrl: '',
-  readTime: 3,
-};
-
 export default function AdminArticlesPage() {
-  const { articles, loading, add, update, remove } = useArticles();
-  const [editing, setEditing] = useState<StoredArticle | null>(null);
-  const [isNew, setIsNew] = useState(false);
+  const router = useRouter();
+  const { articles, loading, update, remove } = useArticles();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
-  const openNew = () => {
-    setEditing({ ...emptyArticle, id: '' });
-    setIsNew(true);
-  };
-
-  const openEdit = (a: StoredArticle) => {
-    setEditing({ ...a });
-    setIsNew(false);
-  };
-
-  const save = async () => {
-    if (!editing) return;
-    setSaving(true);
-    try {
-      if (isNew) {
-        await add({
-          ...editing,
-          id: generateId(),
-          slug: editing.slug || editing.title.replace(/\s+/g, '-').toLowerCase(),
-        });
-      } else {
-        await update(editing.id, editing);
-      }
-      setEditing(null);
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const toggleHidden = async (a: StoredArticle) => {
     setActionLoading(a.id);
@@ -93,7 +41,7 @@ export default function AdminArticlesPage() {
           )}
         </p>
         <button
-          onClick={openNew}
+          onClick={() => router.push('/admin/articles/new')}
           className="px-4 py-2 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors"
         >
           + مقال جديد
@@ -137,7 +85,7 @@ export default function AdminArticlesPage() {
                   {actionLoading === a.id ? 'جاري...' : a.hidden ? 'إظهار' : 'إخفاء'}
                 </button>
                 <button
-                  onClick={() => openEdit(a)}
+                  onClick={() => router.push(`/admin/articles/${a.id}/edit`)}
                   className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors"
                 >
                   تعديل
@@ -153,115 +101,6 @@ export default function AdminArticlesPage() {
           ))}
         </div>
       )}
-
-      <Modal
-        open={!!editing}
-        onClose={() => !saving && setEditing(null)}
-        title={isNew ? 'مقال جديد' : 'تعديل المقال'}
-      >
-        {editing && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-1">العنوان</label>
-              <input
-                value={editing.title}
-                onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                disabled={saving}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-1">الرابط (slug)</label>
-              <input
-                value={editing.slug}
-                onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
-                disabled={saving}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
-                placeholder="يتم إنشاؤه تلقائياً من العنوان"
-                dir="ltr"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-1">المقتطف</label>
-              <textarea
-                value={editing.excerpt}
-                onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })}
-                rows={2}
-                disabled={saving}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none disabled:opacity-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-1">المحتوى</label>
-              <textarea
-                value={editing.content}
-                onChange={(e) => setEditing({ ...editing, content: e.target.value })}
-                rows={8}
-                disabled={saving}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none disabled:opacity-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-1">رابط الصورة</label>
-              <input
-                value={editing.imageUrl}
-                onChange={(e) => setEditing({ ...editing, imageUrl: e.target.value })}
-                disabled={saving}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
-                placeholder="https://images.unsplash.com/..."
-                dir="ltr"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-charcoal mb-1">التصنيف</label>
-                <select
-                  value={editing.category}
-                  onChange={(e) => {
-                    const cat = e.target.value as StoredArticle['category'];
-                    setEditing({ ...editing, category: cat, categoryLabel: categoryLabels[cat] || cat });
-                  }}
-                  disabled={saving}
-                  className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
-                >
-                  {Object.entries(categoryLabels).map(([k, v]) => (
-                    <option key={k} value={k}>{v}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-charcoal mb-1">وقت القراءة (دقائق)</label>
-                <input
-                  type="number"
-                  value={editing.readTime}
-                  onChange={(e) => setEditing({ ...editing, readTime: parseInt(e.target.value) || 3 })}
-                  min={1}
-                  disabled={saving}
-                  className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
-                />
-              </div>
-            </div>
-            <label className="flex items-center gap-2 text-sm text-charcoal cursor-pointer">
-              <input
-                type="checkbox"
-                checked={editing.featured}
-                onChange={(e) => setEditing({ ...editing, featured: e.target.checked })}
-                disabled={saving}
-                className="rounded"
-              />
-              مقال مميز
-            </label>
-            <button
-              onClick={save}
-              disabled={!editing.title.trim() || saving}
-              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-              {saving ? 'جاري الحفظ...' : 'حفظ'}
-            </button>
-          </div>
-        )}
-      </Modal>
 
       <ConfirmDialog
         open={!!deleteId}
