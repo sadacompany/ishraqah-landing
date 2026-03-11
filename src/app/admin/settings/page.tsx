@@ -13,6 +13,9 @@ export default function AdminSettingsPage() {
   const [pwError, setPwError] = useState(false);
   const [importMsg, setImportMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,20 +30,26 @@ export default function AdminSettingsPage() {
       setPwError(true);
       return;
     }
-    const ok = await changePassword(currentPw, newPw);
-    if (ok) {
-      setPwMsg('تم تغيير كلمة المرور بنجاح');
-      setPwError(false);
-      setCurrentPw('');
-      setNewPw('');
-      setConfirmPw('');
-    } else {
-      setPwMsg('كلمة المرور الحالية غير صحيحة');
-      setPwError(true);
+    setSaving(true);
+    try {
+      const ok = await changePassword(currentPw, newPw);
+      if (ok) {
+        setPwMsg('تم تغيير كلمة المرور بنجاح');
+        setPwError(false);
+        setCurrentPw('');
+        setNewPw('');
+        setConfirmPw('');
+      } else {
+        setPwMsg('كلمة المرور الحالية غير صحيحة');
+        setPwError(true);
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleExport = async () => {
+    setExporting(true);
     try {
       const data = await apiGet('/api/settings/export');
       const json = JSON.stringify(data, null, 2);
@@ -53,12 +62,15 @@ export default function AdminSettingsPage() {
       URL.revokeObjectURL(url);
     } catch {
       alert('فشل تصدير البيانات');
+    } finally {
+      setExporting(false);
     }
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setImporting(true);
     const reader = new FileReader();
     reader.onload = async () => {
       try {
@@ -67,6 +79,8 @@ export default function AdminSettingsPage() {
         setImportMsg('تم استيراد البيانات بنجاح');
       } catch {
         setImportMsg('فشل استيراد البيانات. تأكد من صحة الملف.');
+      } finally {
+        setImporting(false);
       }
     };
     reader.readAsText(file);
@@ -85,7 +99,8 @@ export default function AdminSettingsPage() {
             onChange={(e) => setCurrentPw(e.target.value)}
             placeholder="كلمة المرور الحالية"
             required
-            className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+            disabled={saving}
+            className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
           />
           <input
             type="password"
@@ -93,7 +108,8 @@ export default function AdminSettingsPage() {
             onChange={(e) => setNewPw(e.target.value)}
             placeholder="كلمة المرور الجديدة"
             required
-            className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+            disabled={saving}
+            className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
           />
           <input
             type="password"
@@ -101,16 +117,19 @@ export default function AdminSettingsPage() {
             onChange={(e) => setConfirmPw(e.target.value)}
             placeholder="تأكيد كلمة المرور الجديدة"
             required
-            className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+            disabled={saving}
+            className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
           />
           {pwMsg && (
             <p className={`text-xs px-3 py-2 rounded-lg ${pwError ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50'}`}>{pwMsg}</p>
           )}
           <button
             type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-charcoal hover:bg-charcoal-light rounded-xl transition-colors"
+            disabled={saving}
+            className="px-4 py-2 text-sm font-medium text-white bg-charcoal hover:bg-charcoal-light rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
           >
-            تغيير كلمة المرور
+            {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+            {saving ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
           </button>
         </form>
       </div>
@@ -122,15 +141,19 @@ export default function AdminSettingsPage() {
           <div className="flex gap-3">
             <button
               onClick={handleExport}
-              className="px-4 py-2 text-sm font-medium text-white bg-teal hover:bg-teal-light rounded-xl transition-colors"
+              disabled={exporting}
+              className="px-4 py-2 text-sm font-medium text-white bg-teal hover:bg-teal-light rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
             >
-              تصدير البيانات
+              {exporting && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {exporting ? 'جاري التصدير...' : 'تصدير البيانات'}
             </button>
             <button
               onClick={() => fileRef.current?.click()}
-              className="px-4 py-2 text-sm font-medium text-charcoal bg-cream-warm hover:bg-cream-dark rounded-xl transition-colors"
+              disabled={importing}
+              className="px-4 py-2 text-sm font-medium text-charcoal bg-cream-warm hover:bg-cream-dark rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
             >
-              استيراد البيانات
+              {importing && <div className="w-3.5 h-3.5 border-2 border-charcoal border-t-transparent rounded-full animate-spin" />}
+              {importing ? 'جاري الاستيراد...' : 'استيراد البيانات'}
             </button>
             <input ref={fileRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
           </div>

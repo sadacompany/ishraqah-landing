@@ -29,10 +29,13 @@ const emptyArticle: Omit<StoredArticle, 'id'> = {
 };
 
 export default function AdminArticlesPage() {
-  const { articles, add, update, remove } = useArticles();
+  const { articles, loading, add, update, remove } = useArticles();
   const [editing, setEditing] = useState<StoredArticle | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const openNew = () => {
     setEditing({ ...emptyArticle, id: '' });
@@ -46,21 +49,37 @@ export default function AdminArticlesPage() {
 
   const save = async () => {
     if (!editing) return;
-    if (isNew) {
-      await add({
-        ...editing,
-        id: generateId(),
-        slug: editing.slug || editing.title.replace(/\s+/g, '-').toLowerCase(),
-      });
-    } else {
-      await update(editing.id, editing);
+    setSaving(true);
+    try {
+      if (isNew) {
+        await add({
+          ...editing,
+          id: generateId(),
+          slug: editing.slug || editing.title.replace(/\s+/g, '-').toLowerCase(),
+        });
+      } else {
+        await update(editing.id, editing);
+      }
+      setEditing(null);
+    } finally {
+      setSaving(false);
     }
-    setEditing(null);
   };
 
   const toggleHidden = async (a: StoredArticle) => {
-    await update(a.id, { hidden: !a.hidden } as Partial<StoredArticle>);
+    setActionLoading(a.id);
+    try {
+      await update(a.id, { hidden: !a.hidden } as Partial<StoredArticle>);
+    } finally {
+      setActionLoading(null);
+    }
   };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -108,13 +127,14 @@ export default function AdminArticlesPage() {
               <div className="flex items-center gap-2 mr-4">
                 <button
                   onClick={() => toggleHidden(a)}
-                  className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
+                  disabled={actionLoading === a.id}
+                  className={`text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 ${
                     a.hidden
                       ? 'bg-green-50 text-green-600 hover:bg-green-100'
                       : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
                   }`}
                 >
-                  {a.hidden ? 'إظهار' : 'إخفاء'}
+                  {actionLoading === a.id ? 'جاري...' : a.hidden ? 'إظهار' : 'إخفاء'}
                 </button>
                 <button
                   onClick={() => openEdit(a)}
@@ -136,7 +156,7 @@ export default function AdminArticlesPage() {
 
       <Modal
         open={!!editing}
-        onClose={() => setEditing(null)}
+        onClose={() => !saving && setEditing(null)}
         title={isNew ? 'مقال جديد' : 'تعديل المقال'}
       >
         {editing && (
@@ -146,7 +166,8 @@ export default function AdminArticlesPage() {
               <input
                 value={editing.title}
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+                disabled={saving}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
               />
             </div>
             <div>
@@ -154,7 +175,8 @@ export default function AdminArticlesPage() {
               <input
                 value={editing.slug}
                 onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+                disabled={saving}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
                 placeholder="يتم إنشاؤه تلقائياً من العنوان"
                 dir="ltr"
               />
@@ -165,7 +187,8 @@ export default function AdminArticlesPage() {
                 value={editing.excerpt}
                 onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })}
                 rows={2}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none"
+                disabled={saving}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none disabled:opacity-50"
               />
             </div>
             <div>
@@ -174,7 +197,8 @@ export default function AdminArticlesPage() {
                 value={editing.content}
                 onChange={(e) => setEditing({ ...editing, content: e.target.value })}
                 rows={8}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none"
+                disabled={saving}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none disabled:opacity-50"
               />
             </div>
             <div>
@@ -182,7 +206,8 @@ export default function AdminArticlesPage() {
               <input
                 value={editing.imageUrl}
                 onChange={(e) => setEditing({ ...editing, imageUrl: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+                disabled={saving}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
                 placeholder="https://images.unsplash.com/..."
                 dir="ltr"
               />
@@ -196,7 +221,8 @@ export default function AdminArticlesPage() {
                     const cat = e.target.value as StoredArticle['category'];
                     setEditing({ ...editing, category: cat, categoryLabel: categoryLabels[cat] || cat });
                   }}
-                  className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+                  disabled={saving}
+                  className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
                 >
                   {Object.entries(categoryLabels).map(([k, v]) => (
                     <option key={k} value={k}>{v}</option>
@@ -210,7 +236,8 @@ export default function AdminArticlesPage() {
                   value={editing.readTime}
                   onChange={(e) => setEditing({ ...editing, readTime: parseInt(e.target.value) || 3 })}
                   min={1}
-                  className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+                  disabled={saving}
+                  className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -219,16 +246,18 @@ export default function AdminArticlesPage() {
                 type="checkbox"
                 checked={editing.featured}
                 onChange={(e) => setEditing({ ...editing, featured: e.target.checked })}
+                disabled={saving}
                 className="rounded"
               />
               مقال مميز
             </label>
             <button
               onClick={save}
-              disabled={!editing.title.trim()}
-              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50"
+              disabled={!editing.title.trim() || saving}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              حفظ
+              {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {saving ? 'جاري الحفظ...' : 'حفظ'}
             </button>
           </div>
         )}
@@ -236,10 +265,21 @@ export default function AdminArticlesPage() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
+        onClose={() => !deleting && setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            setDeleting(true);
+            try {
+              await remove(deleteId);
+              setDeleteId(null);
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }}
         title="حذف المقال"
         message="هل أنت متأكد من حذف هذا المقال؟"
+        loading={deleting}
       />
     </div>
   );

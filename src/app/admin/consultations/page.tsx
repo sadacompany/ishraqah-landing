@@ -9,11 +9,14 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import type { ConsultationRequest } from '@/lib/types';
 
 export default function AdminConsultationsPage() {
-  const { items, update, remove } = useConsultations();
+  const { items, loading, update, remove } = useConsultations();
   const [selected, setSelected] = useState<ConsultationRequest | null>(null);
   const [answer, setAnswer] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const filtered = filter === 'all' ? items : items.filter((c) => c.status === filter);
   const sorted = [...filtered].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -25,14 +28,30 @@ export default function AdminConsultationsPage() {
 
   const submitAnswer = async () => {
     if (!selected) return;
-    await update(selected.id, { answer, status: 'answered' });
-    setSelected(null);
-    setAnswer('');
+    setSaving(true);
+    try {
+      await update(selected.id, { answer, status: 'answered' });
+      setSelected(null);
+      setAnswer('');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const archive = async (id: string) => {
-    await update(id, { status: 'archived' });
+    setActionLoading(id);
+    try {
+      await update(id, { status: 'archived' });
+    } finally {
+      setActionLoading(null);
+    }
   };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -87,9 +106,10 @@ export default function AdminConsultationsPage() {
                       </button>
                       <button
                         onClick={() => archive(c.id)}
-                        className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                        disabled={actionLoading === c.id}
+                        className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
                       >
-                        أرشفة
+                        {actionLoading === c.id ? 'جاري...' : 'أرشفة'}
                       </button>
                     </>
                   )}
@@ -113,7 +133,7 @@ export default function AdminConsultationsPage() {
         </div>
       )}
 
-      <Modal open={!!selected} onClose={() => setSelected(null)} title="الرد على الاستشارة">
+      <Modal open={!!selected} onClose={() => !saving && setSelected(null)} title="الرد على الاستشارة">
         {selected && (
           <div className="space-y-4">
             <div className="bg-cream-warm/50 rounded-lg p-3">
@@ -125,16 +145,18 @@ export default function AdminConsultationsPage() {
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 rows={6}
-                className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-colors resize-none"
+                disabled={saving}
+                className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-colors resize-none disabled:opacity-50"
                 placeholder="اكتب الرد هنا..."
               />
             </div>
             <button
               onClick={submitAnswer}
-              disabled={!answer.trim()}
-              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-teal hover:bg-teal-light rounded-xl transition-colors disabled:opacity-50"
+              disabled={!answer.trim() || saving}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-teal hover:bg-teal-light rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              حفظ الرد
+              {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {saving ? 'جاري الحفظ...' : 'حفظ الرد'}
             </button>
           </div>
         )}
@@ -142,10 +164,21 @@ export default function AdminConsultationsPage() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
+        onClose={() => !deleting && setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            setDeleting(true);
+            try {
+              await remove(deleteId);
+              setDeleteId(null);
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }}
         title="حذف الاستشارة"
         message="هل أنت متأكد من حذف هذه الاستشارة؟ لا يمكن التراجع عن هذا الإجراء."
+        loading={deleting}
       />
     </div>
   );

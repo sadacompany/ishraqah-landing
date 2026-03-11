@@ -8,10 +8,13 @@ import { generateId } from '@/lib/store';
 import type { StoredQuote } from '@/lib/types';
 
 export default function AdminQuotesPage() {
-  const { quotes, add, update, remove } = useQuotes();
+  const { quotes, loading, add, update, remove } = useQuotes();
   const [editing, setEditing] = useState<StoredQuote | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const openNew = () => {
     setEditing({ id: '', text: '', hidden: false });
@@ -25,17 +28,33 @@ export default function AdminQuotesPage() {
 
   const save = async () => {
     if (!editing) return;
-    if (isNew) {
-      await add({ ...editing, id: generateId() });
-    } else {
-      await update(editing.id, { text: editing.text });
+    setSaving(true);
+    try {
+      if (isNew) {
+        await add({ ...editing, id: generateId() });
+      } else {
+        await update(editing.id, { text: editing.text });
+      }
+      setEditing(null);
+    } finally {
+      setSaving(false);
     }
-    setEditing(null);
   };
 
   const toggleHidden = async (q: StoredQuote) => {
-    await update(q.id, { hidden: !q.hidden } as Partial<StoredQuote>);
+    setActionLoading(q.id);
+    try {
+      await update(q.id, { hidden: !q.hidden } as Partial<StoredQuote>);
+    } finally {
+      setActionLoading(null);
+    }
   };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -68,13 +87,14 @@ export default function AdminQuotesPage() {
             <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => toggleHidden(q)}
-                className={`text-xs px-2 py-1 rounded transition-colors ${
+                disabled={actionLoading === q.id}
+                className={`text-xs px-2 py-1 rounded transition-colors disabled:opacity-50 ${
                   q.hidden
                     ? 'bg-green-50 text-green-600 hover:bg-green-100'
                     : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
                 }`}
               >
-                {q.hidden ? 'إظهار' : 'إخفاء'}
+                {actionLoading === q.id ? 'جاري...' : q.hidden ? 'إظهار' : 'إخفاء'}
               </button>
               <button
                 onClick={() => openEdit(q)}
@@ -93,7 +113,7 @@ export default function AdminQuotesPage() {
         ))}
       </div>
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={isNew ? 'اقتباس جديد' : 'تعديل الاقتباس'}>
+      <Modal open={!!editing} onClose={() => !saving && setEditing(null)} title={isNew ? 'اقتباس جديد' : 'تعديل الاقتباس'}>
         {editing && (
           <div className="space-y-4">
             <div>
@@ -102,15 +122,17 @@ export default function AdminQuotesPage() {
                 value={editing.text}
                 onChange={(e) => setEditing({ ...editing, text: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none"
+                disabled={saving}
+                className="w-full px-3 py-2 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 resize-none disabled:opacity-50"
               />
             </div>
             <button
               onClick={save}
-              disabled={!editing.text.trim()}
-              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50"
+              disabled={!editing.text.trim() || saving}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              حفظ
+              {saving && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {saving ? 'جاري الحفظ...' : 'حفظ'}
             </button>
           </div>
         )}
@@ -118,10 +140,21 @@ export default function AdminQuotesPage() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
+        onClose={() => !deleting && setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            setDeleting(true);
+            try {
+              await remove(deleteId);
+              setDeleteId(null);
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }}
         title="حذف الاقتباس"
         message="هل أنت متأكد من حذف هذا الاقتباس؟"
+        loading={deleting}
       />
     </div>
   );

@@ -7,12 +7,29 @@ import { EmptyState } from '@/components/admin/EmptyState';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 
 export default function AdminGuestbookPage() {
-  const { items, update, remove } = useGuestbook();
+  const { items, loading, update, remove } = useGuestbook();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filtered = filter === 'all' ? items : items.filter((e) => e.status === filter);
   const sorted = [...filtered].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const handleStatusChange = async (id: string, status: 'approved' | 'rejected' | 'pending') => {
+    setActionLoading(id);
+    try {
+      await update(id, { status });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -54,33 +71,37 @@ export default function AdminGuestbookPage() {
                 {entry.status === 'pending' && (
                   <>
                     <button
-                      onClick={() => update(entry.id, { status: 'approved' })}
-                      className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors"
+                      onClick={() => handleStatusChange(entry.id, 'approved')}
+                      disabled={actionLoading === entry.id}
+                      className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors disabled:opacity-50"
                     >
-                      موافقة
+                      {actionLoading === entry.id ? 'جاري...' : 'موافقة'}
                     </button>
                     <button
-                      onClick={() => update(entry.id, { status: 'rejected' })}
-                      className="text-xs px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                      onClick={() => handleStatusChange(entry.id, 'rejected')}
+                      disabled={actionLoading === entry.id}
+                      className="text-xs px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50"
                     >
-                      رفض
+                      {actionLoading === entry.id ? 'جاري...' : 'رفض'}
                     </button>
                   </>
                 )}
                 {entry.status === 'approved' && (
                   <button
-                    onClick={() => update(entry.id, { status: 'rejected' })}
-                    className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors"
+                    onClick={() => handleStatusChange(entry.id, 'rejected')}
+                    disabled={actionLoading === entry.id}
+                    className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors disabled:opacity-50"
                   >
-                    إلغاء الموافقة
+                    {actionLoading === entry.id ? 'جاري...' : 'إلغاء الموافقة'}
                   </button>
                 )}
                 {entry.status === 'rejected' && (
                   <button
-                    onClick={() => update(entry.id, { status: 'approved' })}
-                    className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors"
+                    onClick={() => handleStatusChange(entry.id, 'approved')}
+                    disabled={actionLoading === entry.id}
+                    className="text-xs px-3 py-1.5 bg-cream-warm text-charcoal rounded-lg hover:bg-cream-dark transition-colors disabled:opacity-50"
                   >
-                    موافقة
+                    {actionLoading === entry.id ? 'جاري...' : 'موافقة'}
                   </button>
                 )}
                 <button
@@ -97,10 +118,21 @@ export default function AdminGuestbookPage() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
+        onClose={() => !deleting && setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            setDeleting(true);
+            try {
+              await remove(deleteId);
+              setDeleteId(null);
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }}
         title="حذف الرسالة"
         message="هل أنت متأكد من حذف هذه الرسالة؟"
+        loading={deleting}
       />
     </div>
   );

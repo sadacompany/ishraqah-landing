@@ -9,11 +9,19 @@ import { StatsCard } from '@/components/admin/StatsCard';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 
 export default function AdminDashboard() {
-  const { items: consultations } = useConsultations();
-  const { items: quizResults } = useQuizResults();
-  const { items: guestbookEntries } = useGuestbook();
-  const { articles } = useArticles();
-  const { quotes } = useQuotes();
+  const { items: consultations, loading: loadingConsultations } = useConsultations();
+  const { items: quizResults, loading: loadingQuiz } = useQuizResults();
+  const { items: guestbookEntries, loading: loadingGuestbook } = useGuestbook();
+  const { articles, loading: loadingArticles } = useArticles();
+  const { quotes, loading: loadingQuotes } = useQuotes();
+
+  const loading = loadingConsultations || loadingQuiz || loadingGuestbook || loadingArticles || loadingQuotes;
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   const pendingGuestbook = guestbookEntries.filter((e) => e.status === 'pending').length;
   const pendingConsultations = consultations.filter((c) => c.status === 'pending').length;

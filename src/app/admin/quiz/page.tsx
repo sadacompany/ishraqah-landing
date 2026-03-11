@@ -6,8 +6,9 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { useState } from 'react';
 
 export default function AdminQuizPage() {
-  const { items, remove } = useQuizResults();
+  const { items, loading, remove } = useQuizResults();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const sorted = [...items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -22,6 +23,14 @@ export default function AdminQuizPage() {
   const avgScore = items.length > 0
     ? (items.reduce((sum, q) => sum + q.totalScore, 0) / items.length).toFixed(1)
     : '0';
+
+  const followUpCount = items.filter((q) => q.wantsFollowUp).length;
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -49,8 +58,17 @@ export default function AdminQuizPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-cream-dark/30 p-4">
-        <p className="text-sm text-charcoal-light">متوسط الدرجات: <span className="font-bold text-charcoal">{avgScore}</span> من 24</p>
+      <div className="flex gap-3">
+        <div className="flex-1 bg-white rounded-xl border border-cream-dark/30 p-4">
+          <p className="text-sm text-charcoal-light">متوسط الدرجات: <span className="font-bold text-charcoal">{avgScore}</span> من 24</p>
+        </div>
+        {followUpCount > 0 && (
+          <div className="bg-teal-pale rounded-xl border border-teal-light/30 p-4">
+            <p className="text-sm text-teal">
+              <span className="font-bold">{followUpCount}</span> يرغبون بالمتابعة
+            </p>
+          </div>
+        )}
       </div>
 
       {sorted.length === 0 ? (
@@ -59,6 +77,7 @@ export default function AdminQuizPage() {
         <div className="space-y-3">
           {sorted.map((q) => {
             const color = q.totalScore <= 6 ? 'emerald' : q.totalScore <= 13 ? 'amber' : q.totalScore <= 18 ? 'orange' : 'red';
+            const hasContact = q.name || q.phone || q.email;
             return (
               <div key={q.id} className="bg-white rounded-xl border border-cream-dark/30 p-4">
                 <div className="flex items-center justify-between">
@@ -78,8 +97,36 @@ export default function AdminQuizPage() {
                     حذف
                   </button>
                 </div>
+
+                {/* Contact Info */}
+                {hasContact && (
+                  <div className={`mt-3 pt-3 border-t border-cream-dark/20 ${q.wantsFollowUp ? 'bg-teal-pale/20 -mx-4 -mb-4 px-4 pb-4 rounded-b-xl' : ''}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-4 h-4 text-bronze" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="text-xs font-medium text-charcoal">بيانات التواصل</span>
+                      {q.wantsFollowUp && (
+                        <span className="text-[10px] bg-teal text-white px-2 py-0.5 rounded-full">يرغب بالمتابعة</span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-charcoal-light">
+                      {q.name && (
+                        <p>الاسم: <span className="text-charcoal font-medium">{q.name}</span></p>
+                      )}
+                      {q.phone && (
+                        <p>الجوال: <span className="text-charcoal font-medium" dir="ltr">{q.phone}</span></p>
+                      )}
+                      {q.email && (
+                        <p>البريد: <span className="text-charcoal font-medium" dir="ltr">{q.email}</span></p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Technical Info */}
                 {(q.ipAddress || q.country || q.userAgent) && (
-                  <div className="mt-3 pt-3 border-t border-cream-dark/20 text-xs text-charcoal-light space-y-1">
+                  <div className={`${hasContact ? 'mt-2 pt-2' : 'mt-3 pt-3'} ${!hasContact ? 'border-t border-cream-dark/20' : ''} text-xs text-charcoal-light space-y-1`}>
                     {q.ipAddress && <p>IP: <span dir="ltr">{q.ipAddress}</span></p>}
                     {q.country && <p>الدولة: {q.country}</p>}
                     {q.userAgent && <p className="truncate">المتصفح: <span dir="ltr">{q.userAgent.slice(0, 80)}...</span></p>}
@@ -93,10 +140,21 @@ export default function AdminQuizPage() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
+        onClose={() => !deleting && setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            setDeleting(true);
+            try {
+              await remove(deleteId);
+              setDeleteId(null);
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }}
         title="حذف النتيجة"
         message="هل أنت متأكد من حذف هذه النتيجة؟"
+        loading={deleting}
       />
     </div>
   );
