@@ -15,6 +15,10 @@ export interface QuizSubmission {
   answers: number[];
   totalScore: number;
   resultTitle: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+  wantsFollowUp?: boolean;
   ipAddress?: string;
   userAgent?: string;
   country?: string;
@@ -67,8 +71,18 @@ export interface PageView {
 export interface AnalyticsSummary {
   totalViews: number;
   uniqueVisitors: number;
+  todayViews: number;
+  todayUniqueVisitors: number;
   topPages: { path: string; views: number }[];
   topCountries: { country: string; views: number }[];
   dailyViews: { date: string; views: number }[];
   recentVisitors: PageView[];
+  contentCounts: {
+    articles: number;
+    consultations: number;
+    pendingConsultations: number;
+    quizSubmissions: number;
+    guestbookEntries: number;
+    quotes: number;
+  };
 }

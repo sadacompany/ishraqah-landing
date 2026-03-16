@@ -37,11 +37,11 @@ export default async function Home() {
           <div className="max-w-3xl">
             <div className="animate-fade-in-up">
               <span className="inline-block px-3 py-1.5 text-xs font-medium text-bronze bg-bronze-glow/40 rounded-full mb-6">
-                إشراقة
+                إشراقة وعي
               </span>
             </div>
             <h1 className="animate-fade-in-up-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-charcoal leading-[1.4] sm:leading-[1.35]">
-              <span className="text-bronze">إشراقة</span>
+              <span className="text-bronze">إشراقة وعي</span>
               <br />
               لتعزيز الوعي النفسي والتربوي
             </h1>

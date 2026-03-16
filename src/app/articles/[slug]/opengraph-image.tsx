@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import pool from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
-export const alt = 'إشراقة';
+export const alt = 'إشراقة وعي';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -13,7 +13,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     [slug]
   );
   const article = result.rows[0];
-  const title = article?.title || 'إشراقة';
+  const title = article?.title || 'إشراقة وعي';
   const category = article?.categoryLabel || '';
 
   const fontData = await fetch(
@@ -57,7 +57,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               <path d="M 8 36 Q 20 42 32 36 Q 44 30 56 36" stroke="#8B6F4E" strokeWidth="2" strokeLinecap="round" opacity="0.6" fill="none" />
             </svg>
             <div style={{ display: 'flex', fontSize: 28, fontWeight: 700, color: '#8B6F4E' }}>
-              إشراقة
+              إشراقة وعي
             </div>
           </div>
           <div style={{ display: 'flex', fontSize: 20, color: '#9B9590' }}>

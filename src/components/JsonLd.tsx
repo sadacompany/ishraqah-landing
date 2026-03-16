@@ -2,8 +2,8 @@ export function OrganizationJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'إشراقة',
-    alternateName: 'Ishraqah',
+    name: 'إشراقة وعي',
+    alternateName: 'Ishraqah Waie',
     url: 'https://ishraqah.life',
     description: 'منصة متخصصة في تعزيز الوعي النفسي والتربوي',
     founder: {
@@ -26,7 +26,7 @@ export function WebsiteJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'إشراقة',
+    name: 'إشراقة وعي',
     url: 'https://ishraqah.life',
     inLanguage: 'ar',
     potentialAction: {
@@ -71,7 +71,7 @@ export function ArticleJsonLd({
     },
     publisher: {
       '@type': 'Organization',
-      name: 'إشراقة',
+      name: 'إشراقة وعي',
       url: 'https://ishraqah.life',
     },
     datePublished: datePublished || '2024-01-01',

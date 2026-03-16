@@ -9,33 +9,51 @@ import { apiPost } from '@/lib/api-client';
 export default function SelfTestPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
+  const [showContactForm, setShowContactForm] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [wantsFollowUp, setWantsFollowUp] = useState(false);
 
   const totalQuestions = panicQuiz.questions.length;
 
-  const handleAnswer = async (value: number) => {
+  const handleAnswer = (value: number) => {
     const newAnswers = [...answers, value];
     setAnswers(newAnswers);
 
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      const totalScore = newAnswers.reduce((sum, a) => sum + a, 0);
-      const resultObj = panicQuiz.results.find(
-        (r) => totalScore >= r.range[0] && totalScore <= r.range[1]
-      );
-      try {
-        await apiPost('/api/quiz-results', {
-          id: generateId(),
-          answers: newAnswers,
-          totalScore,
-          resultTitle: resultObj?.title || '',
-        });
-      } catch {
-        // Best-effort tracking
-      }
-      setShowResults(true);
+      setShowContactForm(true);
     }
+  };
+
+  const submitQuiz = async (skip: boolean) => {
+    setSubmitting(true);
+    const totalScore = answers.reduce((sum, a) => sum + a, 0);
+    const resultObj = panicQuiz.results.find(
+      (r) => totalScore >= r.range[0] && totalScore <= r.range[1]
+    );
+    try {
+      await apiPost('/api/quiz-results', {
+        id: generateId(),
+        answers,
+        totalScore,
+        resultTitle: resultObj?.title || '',
+        name: skip ? '' : contactName.trim(),
+        phone: skip ? '' : contactPhone.trim(),
+        email: skip ? '' : contactEmail.trim(),
+        wantsFollowUp: skip ? false : wantsFollowUp,
+      });
+    } catch {
+      // Best-effort tracking
+    }
+    setSubmitting(false);
+    setShowContactForm(false);
+    setShowResults(true);
   };
 
   const totalScore = answers.reduce((sum, a) => sum + a, 0);
@@ -46,10 +64,17 @@ export default function SelfTestPage() {
   const reset = () => {
     setCurrentQuestion(0);
     setAnswers([]);
+    setShowContactForm(false);
     setShowResults(false);
+    setContactName('');
+    setContactPhone('');
+    setContactEmail('');
+    setWantsFollowUp(false);
   };
 
-  const progress = ((currentQuestion + (showResults ? 1 : 0)) / totalQuestions) * 100;
+  const progress = ((currentQuestion + (showResults || showContactForm ? 1 : 0)) / totalQuestions) * 100;
+
+  const canSubmitContact = contactName.trim() && (contactPhone.trim() || contactEmail.trim());
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -76,7 +101,7 @@ export default function SelfTestPage() {
         </p>
       </div>
 
-      {!showResults ? (
+      {!showResults && !showContactForm ? (
         <div className="bg-white rounded-2xl p-6 sm:p-8 border border-cream-dark/30">
           {/* Progress */}
           <div className="mb-8">
@@ -110,6 +135,81 @@ export default function SelfTestPage() {
                   {option.label}
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      ) : showContactForm ? (
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-cream-dark/30 animate-fade-in-up">
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 mx-auto rounded-full bg-bronze-glow/30 flex items-center justify-center mb-4">
+              <svg className="w-7 h-7 text-bronze" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-charcoal mb-2">قبل عرض النتيجة</h2>
+            <p className="text-sm text-charcoal-light leading-relaxed">
+              يمكنك ترك بياناتك إذا كنت ترغب بالمتابعة معنا. هذا اختياري تمامًا.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-1">الاسم</label>
+              <input
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder="أدخل اسمك"
+                className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-1">رقم الجوال</label>
+              <input
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="05xxxxxxxx"
+                type="tel"
+                dir="ltr"
+                className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 text-left"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-charcoal mb-1">البريد الإلكتروني</label>
+              <input
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                placeholder="example@email.com"
+                type="email"
+                dir="ltr"
+                className="w-full px-4 py-3 text-sm bg-cream-warm border border-cream-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-bronze/30 text-left"
+              />
+            </div>
+
+            <label className="flex items-center gap-3 text-sm text-charcoal cursor-pointer bg-teal-pale/30 rounded-xl p-4">
+              <input
+                type="checkbox"
+                checked={wantsFollowUp}
+                onChange={(e) => setWantsFollowUp(e.target.checked)}
+                className="rounded accent-bronze w-4 h-4"
+              />
+              <span>أرغب بالمتابعة والتواصل معي بخصوص النتيجة</span>
+            </label>
+
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button
+                onClick={() => submitQuiz(false)}
+                disabled={!canSubmitContact || submitting}
+                className="flex-1 px-5 py-3 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors disabled:opacity-50"
+              >
+                {submitting ? 'جاري الإرسال...' : 'إرسال وعرض النتيجة'}
+              </button>
+              <button
+                onClick={() => submitQuiz(true)}
+                disabled={submitting}
+                className="flex-1 px-5 py-3 text-sm font-medium text-charcoal bg-cream-warm hover:bg-cream-dark rounded-xl transition-colors disabled:opacity-50"
+              >
+                تخطي وعرض النتيجة
+              </button>
             </div>
           </div>
         </div>

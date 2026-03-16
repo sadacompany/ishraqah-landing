@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Logo size={64} className="mx-auto text-charcoal mb-4" />
-          <h1 className="text-2xl font-bold text-charcoal">إشراقة</h1>
+          <h1 className="text-2xl font-bold text-charcoal">إشراقة وعي</h1>
           <p className="text-sm text-charcoal-light mt-1">تسجيل الدخول للوحة التحكم</p>
         </div>
 

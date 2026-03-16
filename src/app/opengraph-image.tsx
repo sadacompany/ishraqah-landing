@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const dynamic = 'force-dynamic';
-export const alt = 'إشراقة - لتعزيز الوعي النفسي والتربوي';
+export const alt = 'إشراقة وعي - لتعزيز الوعي النفسي والتربوي';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -37,7 +37,7 @@ export default async function Image() {
         </svg>
 
         <div style={{ display: 'flex', fontSize: 72, fontWeight: 700, color: '#8B6F4E', marginTop: 24 }}>
-          إشراقة
+          إشراقة وعي
         </div>
 
         <div style={{ display: 'flex', fontSize: 28, color: '#6B6560', marginTop: 16 }}>

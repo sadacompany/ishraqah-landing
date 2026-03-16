@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { login as doLogin, logout as doLogout, checkAuth, changePassword as doChange } from '../auth';
+import { login as doLogin, logout as doLogout, checkAuth } from '../auth';
 
 export function useAuth() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -46,9 +46,5 @@ export function useAuth() {
     setAuthenticated(false);
   }, []);
 
-  const changePassword = useCallback(async (current: string, next: string) => {
-    return doChange(current, next);
-  }, []);
-
-  return { authenticated, loading, login, logout, changePassword };
+  return { authenticated, loading, login, logout };
 }

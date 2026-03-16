@@ -10,7 +10,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <Logo size={40} className="text-bronze-light" />
-              <h3 className="text-lg font-bold text-white">إشراقة</h3>
+              <h3 className="text-lg font-bold text-white">إشراقة وعي</h3>
             </div>
             <p className="text-sm text-cream-dark/80 leading-relaxed">
               تعزيز الوعي النفسي والتربوي من خلال الاستشارات والمؤلفات. نسعى
@@ -100,7 +100,7 @@ export function Footer() {
 
         <div className="border-t border-cream-dark/10 mt-12 pt-8 text-center">
           <p className="text-xs text-cream-dark/50">
-            جميع الحقوق محفوظة لموقع إشراقة &copy;{' '}
+            جميع الحقوق محفوظة لموقع إشراقة وعي &copy;{' '}
             {new Date().getFullYear()}
           </p>
         </div>
