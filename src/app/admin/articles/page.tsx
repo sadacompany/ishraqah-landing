@@ -24,7 +24,7 @@ export default function AdminArticlesPage() {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center py-20" role="status" aria-label="جاري التحميل">
+    <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="جاري التحميل">
       <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" aria-hidden="true" />
       <span className="sr-only">جاري التحميل...</span>
     </div>
