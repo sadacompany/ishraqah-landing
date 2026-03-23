@@ -98,38 +98,64 @@ export default function AdminQuizPage() {
                   </button>
                 </div>
 
-                {/* Contact Info */}
-                {hasContact && (
-                  <div className={`mt-3 pt-3 border-t border-cream-dark/20 ${q.wantsFollowUp ? 'bg-teal-pale/20 -mx-4 -mb-4 px-4 pb-4 rounded-b-xl' : ''}`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg className="w-4 h-4 text-bronze" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span className="text-xs font-medium text-charcoal">بيانات التواصل</span>
-                      {q.wantsFollowUp && (
-                        <span className="text-[10px] bg-teal text-white px-2 py-0.5 rounded-full">يرغب بالمتابعة</span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-charcoal-light">
-                      {q.name && (
-                        <p>الاسم: <span className="text-charcoal font-medium">{q.name}</span></p>
-                      )}
-                      {q.phone && (
-                        <p>الجوال: <span className="text-charcoal font-medium" dir="ltr">{q.phone}</span></p>
-                      )}
-                      {q.email && (
-                        <p>البريد: <span className="text-charcoal font-medium" dir="ltr">{q.email}</span></p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Technical Info */}
-                {(q.ipAddress || q.country || q.userAgent) && (
-                  <div className={`${hasContact ? 'mt-2 pt-2' : 'mt-3 pt-3'} ${!hasContact ? 'border-t border-cream-dark/20' : ''} text-xs text-charcoal-light space-y-1`}>
-                    {q.ipAddress && <p>IP: <span dir="ltr">{q.ipAddress}</span></p>}
-                    {q.country && <p>الدولة: {q.country}</p>}
-                    {q.userAgent && <p className="truncate">المتصفح: <span dir="ltr">{q.userAgent.slice(0, 80)}...</span></p>}
+                {/* Contact & Device Info */}
+                {(hasContact || q.country || q.userAgent) && (
+                  <div className={`mt-3 pt-3 border-t border-cream-dark/20 flex flex-wrap items-center gap-2 ${q.wantsFollowUp ? 'bg-teal-pale/20 -mx-4 -mb-4 px-4 pb-4 rounded-b-xl' : ''}`}>
+                    {q.name && (
+                      <span className="inline-flex items-center gap-1.5 text-xs bg-bronze-glow/30 text-charcoal px-3 py-1.5 rounded-full">
+                        <svg className="w-3.5 h-3.5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {q.name}
+                      </span>
+                    )}
+                    {q.phone && (
+                      <span className="inline-flex items-center gap-1.5 text-xs bg-teal-pale text-teal px-3 py-1.5 rounded-full" dir="ltr">
+                        <svg className="w-3.5 h-3.5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        {q.phone}
+                      </span>
+                    )}
+                    {q.email && (
+                      <span className="inline-flex items-center gap-1.5 text-xs bg-cream-warm text-charcoal-light px-3 py-1.5 rounded-full" dir="ltr">
+                        <svg className="w-3.5 h-3.5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                        {q.email}
+                      </span>
+                    )}
+                    {q.country && (
+                      <span className="inline-flex items-center gap-1.5 text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full">
+                        <svg className="w-3.5 h-3.5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                        </svg>
+                        {q.country}
+                      </span>
+                    )}
+                    {q.userAgent && (() => {
+                      const ua = q.userAgent;
+                      const device = ua.includes('iPhone') ? 'iPhone'
+                        : ua.includes('iPad') ? 'iPad'
+                        : ua.includes('Android') ? 'Android'
+                        : ua.includes('Macintosh') ? 'Mac'
+                        : ua.includes('Windows') ? 'Windows'
+                        : ua.includes('Linux') ? 'Linux'
+                        : 'متصفح';
+                      return (
+                        <span className="inline-flex items-center gap-1.5 text-xs bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full">
+                          <svg className="w-3.5 h-3.5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z" />
+                          </svg>
+                          {device}
+                        </span>
+                      );
+                    })()}
+                    {q.wantsFollowUp && (
+                      <span className="inline-flex items-center gap-1.5 text-[11px] bg-teal text-white px-3 py-1.5 rounded-full font-medium">
+                        يرغب بالمتابعة
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
