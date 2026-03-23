@@ -16,12 +16,12 @@ export function Header() {
           <Link href="/" className="flex items-center gap-3">
             <Logo size={40} className="text-bronze" />
             <div>
-              <h1 className="text-lg font-bold text-charcoal leading-tight">
+              <span className="text-lg font-bold text-charcoal leading-tight block">
                 إشراقة وعي
-              </h1>
-              <p className="text-[10px] text-charcoal-light hidden sm:block">
+              </span>
+              <span className="text-xs text-charcoal-light hidden sm:block">
                 تعزيز الوعي النفسي والتربوي
-              </p>
+              </span>
             </div>
           </Link>
 
@@ -37,6 +37,7 @@ export function Header() {
                     {item.label}
                     <svg
                       className="inline-block w-3 h-3 mr-1"
+                      aria-hidden="true"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -87,11 +88,11 @@ export function Header() {
               aria-label="القائمة"
             >
               {mobileOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-6 h-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-6 h-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}

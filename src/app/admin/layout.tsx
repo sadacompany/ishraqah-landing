@@ -13,7 +13,6 @@ const pageTitles: Record<string, string> = {
   '/admin/guestbook': 'بصمة الزوار',
   '/admin/quotes': 'الاقتباسات',
   '/admin/analytics': 'التحليلات',
-  '/admin/settings': 'الإعدادات',
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -4,11 +4,12 @@ interface ConsultationCardProps {
 
 export function ConsultationCard({ consultation }: ConsultationCardProps) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-cream-dark/30 hover:border-teal-pale hover:shadow-sm transition-[border-color,box-shadow] duration-200">
+    <article className="bg-white rounded-2xl p-6 border border-cream-dark/30 hover:border-teal-pale hover:shadow-sm transition-[border-color,box-shadow] duration-200">
       <div className="flex items-start gap-3 mb-4">
         <div className="shrink-0 w-10 h-10 rounded-xl bg-teal-pale flex items-center justify-center">
           <svg
             className="w-5 h-5 text-teal"
+            aria-hidden="true"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -42,6 +43,6 @@ export function ConsultationCard({ consultation }: ConsultationCardProps) {
           </p>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

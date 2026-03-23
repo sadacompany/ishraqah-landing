@@ -6,7 +6,7 @@
   --color-cream-dark: #EDE5D8;
   --color-charcoal: #2C2825;
   --color-charcoal-light: #6B6460;
-  --color-bronze: #8B6F4E;
+  --color-bronze: #7A6243;
   --color-bronze-light: #C9A882;
   --color-bronze-glow: #E8D5C0;
   --color-teal: #5B7B7A;
@@ -85,6 +85,16 @@ body {
 .article-content li {
   margin-bottom: 0.5em;
   line-height: 1.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-up-delay-1,
+  .animate-fade-in-up-delay-2,
+  .animate-fade-in-up-delay-3 {
+    animation: none !important;
+    opacity: 1 !important;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {

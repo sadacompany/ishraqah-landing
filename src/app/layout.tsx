@@ -106,7 +106,6 @@ export default function RootLayout({
                     navigator.sendBeacon('/api/analytics/track', JSON.stringify({
                       path: location.pathname,
                       durationSeconds: duration,
-                      sessionId: '',
                     }));
                   }
                 });

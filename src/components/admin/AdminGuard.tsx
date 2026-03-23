@@ -17,8 +17,9 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream">
-        <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-cream" role="status" aria-label="جاري التحميل">
+        <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+        <span className="sr-only">جاري التحميل...</span>
       </div>
     );
   }

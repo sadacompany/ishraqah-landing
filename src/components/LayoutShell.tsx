@@ -14,8 +14,14 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-[100] focus:bg-bronze focus:text-white focus:px-4 focus:py-2 focus:rounded-xl focus:text-sm focus:font-medium"
+      >
+        تخطي إلى المحتوى
+      </a>
       <Header />
-      <main className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1">{children}</main>
       <Footer />
     </>
   );

@@ -84,10 +84,11 @@ export default function GuestbookPage() {
         </h2>
 
         {submitted ? (
-          <div className="text-center py-6">
+          <div className="text-center py-6" role="status" aria-live="polite">
             <div className="w-12 h-12 mx-auto rounded-full bg-teal-pale flex items-center justify-center mb-3">
               <svg
                 className="w-6 h-6 text-teal"
+                aria-hidden="true"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

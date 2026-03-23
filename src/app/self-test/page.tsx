@@ -111,7 +111,14 @@ export default function SelfTestPage() {
               </span>
               <span>{Math.round(progress)}%</span>
             </div>
-            <div className="h-1.5 bg-cream-warm rounded-full overflow-hidden">
+            <div
+              className="h-1.5 bg-cream-warm rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={Math.round(progress)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`التقدم: ${Math.round(progress)}%`}
+            >
               <div
                 className="h-full bg-bronze rounded-full transition-[width] duration-500"
                 style={{ width: `${progress}%` }}
@@ -214,7 +221,7 @@ export default function SelfTestPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-cream-dark/30 animate-fade-in-up">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-cream-dark/30 animate-fade-in-up" role="status" aria-live="polite">
           <div className="text-center mb-8">
             <div
               className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${

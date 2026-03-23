@@ -124,6 +124,7 @@ export default async function Home() {
               جميع المقالات
               <svg
                 className="w-4 h-4"
+                aria-hidden="true"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -163,6 +164,7 @@ export default async function Home() {
               جميع المقالات
               <svg
                 className="w-4 h-4"
+                aria-hidden="true"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -254,6 +256,7 @@ export default async function Home() {
                           ? 'text-teal'
                           : 'text-charcoal-light'
                     }`}
+                    aria-hidden="true"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -321,6 +324,7 @@ export default async function Home() {
               <div className="shrink-0 w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-sm">
                 <svg
                   className="w-10 h-10 text-teal"
+                  aria-hidden="true"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -368,6 +372,7 @@ export default async function Home() {
               عرض الأرشيف
               <svg
                 className="w-4 h-4"
+                aria-hidden="true"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
