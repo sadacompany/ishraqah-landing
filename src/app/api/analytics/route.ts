@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { requireAuth } from '@/lib/require-auth';
 
+export async function DELETE() {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  await pool.query('DELETE FROM page_views');
+
+  return NextResponse.json({ ok: true });
+}
+
 export async function GET(request: Request) {
   const authError = await requireAuth();
   if (authError) return authError;
