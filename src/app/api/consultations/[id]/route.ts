@@ -22,6 +22,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     fields.push(`answered_at = $${idx++}`);
     values.push(new Date().toISOString());
   }
+  if (body.solved !== undefined) {
+    fields.push(`solved = $${idx++}`);
+    values.push(body.solved);
+  }
 
   if (fields.length === 0) {
     return NextResponse.json({ error: 'لا توجد حقول للتحديث' }, { status: 400 });

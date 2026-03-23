@@ -47,9 +47,19 @@ export default function AdminConsultationsPage() {
     }
   };
 
+  const toggleSolved = async (c: ConsultationRequest) => {
+    setActionLoading(c.id);
+    try {
+      await update(c.id, { solved: !c.solved });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+    <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="جاري التحميل">
+      <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+      <span className="sr-only">جاري التحميل...</span>
     </div>
   );
 
@@ -75,11 +85,21 @@ export default function AdminConsultationsPage() {
       ) : (
         <div className="space-y-3">
           {sorted.map((c) => (
-            <div key={c.id} className="bg-white rounded-xl border border-cream-dark/30 p-5">
+            <div key={c.id} className={`bg-white rounded-xl border border-cream-dark/30 p-5 ${c.solved ? 'opacity-60' : ''}`}>
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <StatusBadge status={c.status} />
+                    {c.source === 'chat' && (
+                      <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                        محادثة فورية
+                      </span>
+                    )}
+                    {c.solved && (
+                      <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+                        تم الحل
+                      </span>
+                    )}
                     <span className="text-xs text-charcoal-light">{c.type || 'عامة'}</span>
                   </div>
                   <p className="text-xs text-charcoal-light">
@@ -87,7 +107,18 @@ export default function AdminConsultationsPage() {
                     {c.email && ` · ${c.email}`}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => toggleSolved(c)}
+                    disabled={actionLoading === c.id}
+                    className={`text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 ${
+                      c.solved
+                        ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                        : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    {actionLoading === c.id ? 'جاري...' : c.solved ? 'تم الحل ✓' : 'حل'}
+                  </button>
                   {c.status === 'pending' && (
                     <button
                       onClick={() => openAnswer(c)}
@@ -121,7 +152,7 @@ export default function AdminConsultationsPage() {
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-charcoal leading-relaxed bg-cream-warm/50 rounded-lg p-3">{c.text}</p>
+              <p className="text-sm text-charcoal leading-relaxed bg-cream-warm/50 rounded-lg p-3 whitespace-pre-wrap">{c.text}</p>
               {c.answer && (
                 <div className="mt-3 bg-teal-pale/30 rounded-lg p-3">
                   <p className="text-xs font-medium text-teal mb-1">الرد:</p>
@@ -137,7 +168,7 @@ export default function AdminConsultationsPage() {
         {selected && (
           <div className="space-y-4">
             <div className="bg-cream-warm/50 rounded-lg p-3">
-              <p className="text-sm text-charcoal leading-relaxed">{selected.text}</p>
+              <p className="text-sm text-charcoal leading-relaxed whitespace-pre-wrap">{selected.text}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-charcoal mb-2">الرد</label>

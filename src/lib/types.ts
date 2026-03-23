@@ -8,6 +8,8 @@ export interface ConsultationRequest {
   answer: string;
   createdAt: string;
   answeredAt: string | null;
+  source?: string;
+  solved?: boolean;
 }
 
 export interface QuizSubmission {

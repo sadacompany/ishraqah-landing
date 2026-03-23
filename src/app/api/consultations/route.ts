@@ -8,7 +8,7 @@ export async function GET() {
   if (authError) return authError;
 
   const result = await pool.query(
-    'SELECT id, name, email, type, text, status, answer, created_at as "createdAt", answered_at as "answeredAt" FROM consultations ORDER BY created_at DESC'
+    'SELECT id, name, email, type, text, status, answer, source, solved, created_at as "createdAt", answered_at as "answeredAt" FROM consultations ORDER BY created_at DESC'
   );
   return NextResponse.json(result.rows);
 }

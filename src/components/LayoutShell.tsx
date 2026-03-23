@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { ChatWidget } from './ChatWidget';
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       <Header />
       <main id="main-content" className="flex-1">{children}</main>
       <Footer />
+      <ChatWidget />
     </>
   );
 }
