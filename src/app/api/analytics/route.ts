@@ -63,12 +63,12 @@ export async function GET(request: Request) {
     guestbookCount,
     quotesCount,
   ] = await Promise.all([
-    pool.query('SELECT COUNT(*) as count FROM page_views'),
+    pool.query("SELECT COUNT(DISTINCT ip_address || DATE(created_at)) as count FROM page_views"),
     pool.query("SELECT COUNT(DISTINCT ip_address) as count FROM page_views WHERE ip_address != ''"),
-    pool.query("SELECT COUNT(*) as count FROM page_views WHERE DATE(created_at) = CURRENT_DATE"),
+    pool.query("SELECT COUNT(DISTINCT ip_address) as count FROM page_views WHERE DATE(created_at) = CURRENT_DATE"),
     pool.query("SELECT COUNT(DISTINCT ip_address) as count FROM page_views WHERE DATE(created_at) = CURRENT_DATE AND ip_address != ''"),
     pool.query(
-      `SELECT path, COUNT(*) as views
+      `SELECT path, COUNT(DISTINCT ip_address) as views
        FROM page_views
        WHERE created_at >= NOW() - INTERVAL '${interval}'
        GROUP BY path
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
        LIMIT 10`
     ),
     pool.query(
-      `SELECT country, COUNT(*) as views
+      `SELECT country, COUNT(DISTINCT ip_address) as views
        FROM page_views
        WHERE country != '' AND created_at >= NOW() - INTERVAL '${interval}'
        GROUP BY country
@@ -84,7 +84,7 @@ export async function GET(request: Request) {
        LIMIT 10`
     ),
     pool.query(
-      `SELECT TO_CHAR(created_at, '${dateFormat}') as date, COUNT(*) as views
+      `SELECT TO_CHAR(created_at, '${dateFormat}') as date, COUNT(DISTINCT ip_address) as views
        FROM page_views
        WHERE created_at >= NOW() - INTERVAL '${interval}'
        GROUP BY TO_CHAR(created_at, '${dateFormat}')
