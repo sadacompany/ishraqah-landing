@@ -14,6 +14,84 @@ const rangeOptions = [
 
 type RangeKey = (typeof rangeOptions)[number]['key'];
 
+const pageNames: Record<string, string> = {
+  '/': 'الرئيسية',
+  '/about': 'من نحن',
+  '/cv': 'السيرة الذاتية',
+  '/articles': 'المقالات',
+  '/books': 'المؤلفات',
+  '/videos': 'الفيديوهات',
+  '/guestbook': 'بصمة الزوار',
+  '/self-test': 'اختبر نفسك',
+  '/consultations': 'الاستشارات',
+  '/consultations/new': 'استشارة جديدة',
+  '/consultations/follow-up': 'متابعة استشارة',
+  '/consultations/archive': 'أرشيف الاستشارات',
+  '/admin': 'لوحة التحكم',
+};
+
+function getPageName(path: string): string {
+  if (pageNames[path]) return pageNames[path];
+  if (path.startsWith('/articles/')) return 'مقال: ' + path.replace('/articles/', '');
+  if (path.startsWith('/admin/')) return 'لوحة التحكم';
+  return path;
+}
+
+const countryNames: Record<string, string> = {
+  'Saudi Arabia': 'السعودية',
+  'United States': 'الولايات المتحدة',
+  'United Arab Emirates': 'الإمارات',
+  'Kuwait': 'الكويت',
+  'Qatar': 'قطر',
+  'Bahrain': 'البحرين',
+  'Oman': 'عُمان',
+  'Yemen': 'اليمن',
+  'Egypt': 'مصر',
+  'Jordan': 'الأردن',
+  'Iraq': 'العراق',
+  'Syria': 'سوريا',
+  'Lebanon': 'لبنان',
+  'Palestine': 'فلسطين',
+  'Libya': 'ليبيا',
+  'Tunisia': 'تونس',
+  'Algeria': 'الجزائر',
+  'Morocco': 'المغرب',
+  'Sudan': 'السودان',
+  'Somalia': 'الصومال',
+  'Mauritania': 'موريتانيا',
+  'Djibouti': 'جيبوتي',
+  'Comoros': 'جزر القمر',
+  'Turkey': 'تركيا',
+  'Iran': 'إيران',
+  'Pakistan': 'باكستان',
+  'India': 'الهند',
+  'United Kingdom': 'بريطانيا',
+  'Germany': 'ألمانيا',
+  'France': 'فرنسا',
+  'Canada': 'كندا',
+  'Australia': 'أستراليا',
+  'Malaysia': 'ماليزيا',
+  'Indonesia': 'إندونيسيا',
+  'Singapore': 'سنغافورة',
+  'China': 'الصين',
+  'Japan': 'اليابان',
+  'South Korea': 'كوريا الجنوبية',
+  'Netherlands': 'هولندا',
+  'Sweden': 'السويد',
+  'Norway': 'النرويج',
+  'Italy': 'إيطاليا',
+  'Spain': 'إسبانيا',
+  'Russia': 'روسيا',
+  'Brazil': 'البرازيل',
+  'South Africa': 'جنوب أفريقيا',
+  'Nigeria': 'نيجيريا',
+  'Mexico': 'المكسيك',
+};
+
+function getCountryName(country: string): string {
+  return countryNames[country] || country;
+}
+
 export default function AdminAnalyticsPage() {
   const [data, setData] = useState<AnalyticsSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,8 +115,9 @@ export default function AdminAnalyticsPage() {
 
   if (loading && !data) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="جاري التحميل">
+        <div className="w-8 h-8 border-2 border-bronze border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+        <span className="sr-only">جاري التحميل...</span>
       </div>
     );
   }
@@ -168,7 +247,7 @@ export default function AdminAnalyticsPage() {
                 <div key={p.path} className="flex items-center justify-between p-2 bg-cream-warm/50 rounded-lg">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-xs text-charcoal-light w-5">{i + 1}</span>
-                    <span className="text-sm text-charcoal truncate" dir="ltr">{p.path}</span>
+                    <span className="text-sm text-charcoal truncate">{getPageName(p.path)}</span>
                   </div>
                   <span className="text-xs font-medium text-bronze mr-2">{Number(p.views).toLocaleString()}</span>
                 </div>
@@ -188,7 +267,7 @@ export default function AdminAnalyticsPage() {
                 <div key={c.country} className="flex items-center justify-between p-2 bg-cream-warm/50 rounded-lg">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-charcoal-light w-5">{i + 1}</span>
-                    <span className="text-sm text-charcoal">{c.country}</span>
+                    <span className="text-sm text-charcoal">{getCountryName(c.country)}</span>
                   </div>
                   <span className="text-xs font-medium text-bronze">{Number(c.views).toLocaleString()}</span>
                 </div>
@@ -204,27 +283,23 @@ export default function AdminAnalyticsPage() {
         {data.recentVisitors.length === 0 ? (
           <p className="text-sm text-charcoal-light text-center py-4">لا توجد زيارات بعد</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-charcoal-light border-b border-cream-dark/30">
-                  <th className="text-right py-2 px-2">الصفحة</th>
-                  <th className="text-right py-2 px-2">الدولة</th>
-                  <th className="text-right py-2 px-2">IP</th>
-                  <th className="text-right py-2 px-2">الوقت</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.recentVisitors.map((v, i) => (
-                  <tr key={i} className="border-b border-cream-dark/10">
-                    <td className="py-2 px-2 text-charcoal truncate max-w-[200px]" dir="ltr">{v.path}</td>
-                    <td className="py-2 px-2 text-charcoal-light">{v.country || '-'}</td>
-                    <td className="py-2 px-2 text-charcoal-light" dir="ltr">{v.ipAddress || '-'}</td>
-                    <td className="py-2 px-2 text-charcoal-light text-xs">{new Date(v.createdAt).toLocaleString('ar-SA')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-2">
+            {data.recentVisitors.map((v, i) => (
+              <div key={i} className="flex items-center justify-between p-3 bg-cream-warm/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-bronze-glow/40 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-bronze" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-charcoal font-medium">{getPageName(v.path)}</p>
+                    <p className="text-xs text-charcoal-light">{v.country ? getCountryName(v.country) : 'غير معروف'}</p>
+                  </div>
+                </div>
+                <span className="text-xs text-charcoal-light">{new Date(v.createdAt).toLocaleString('ar-SA')}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
