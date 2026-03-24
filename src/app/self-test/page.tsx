@@ -2,13 +2,21 @@ import Link from 'next/link';
 import { quizzes } from '@/data/quiz';
 
 const colorMap: Record<string, { bg: string; bgLight: string; text: string; border: string; btnBg: string; btnHover: string }> = {
-  amber: {
-    bg: 'bg-amber-50',
-    bgLight: 'bg-amber-50/50',
-    text: 'text-amber-600',
-    border: 'border-amber-200',
-    btnBg: 'bg-amber-600',
-    btnHover: 'hover:bg-amber-700',
+  bronze: {
+    bg: 'bg-bronze-glow/30',
+    bgLight: 'bg-bronze-glow/20',
+    text: 'text-bronze',
+    border: 'border-bronze-glow',
+    btnBg: 'bg-bronze',
+    btnHover: 'hover:bg-bronze-light',
+  },
+  charcoal: {
+    bg: 'bg-cream-warm',
+    bgLight: 'bg-cream-warm/50',
+    text: 'text-charcoal',
+    border: 'border-cream-dark',
+    btnBg: 'bg-charcoal',
+    btnHover: 'hover:bg-charcoal-light',
   },
   teal: {
     bg: 'bg-teal-pale/50',
@@ -17,14 +25,6 @@ const colorMap: Record<string, { bg: string; bgLight: string; text: string; bord
     border: 'border-teal-pale',
     btnBg: 'bg-teal',
     btnHover: 'hover:bg-teal-light',
-  },
-  indigo: {
-    bg: 'bg-indigo-50',
-    bgLight: 'bg-indigo-50/50',
-    text: 'text-indigo-500',
-    border: 'border-indigo-200',
-    btnBg: 'bg-indigo-500',
-    btnHover: 'hover:bg-indigo-600',
   },
 };
 
@@ -57,7 +57,7 @@ export default function SelfTestPage() {
       {/* Quiz Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {quizzes.map((quiz) => {
-          const colors = colorMap[quiz.color] || colorMap.teal;
+          const colors = colorMap[quiz.color] || colorMap.bronze;
           return (
             <div
               key={quiz.slug}
