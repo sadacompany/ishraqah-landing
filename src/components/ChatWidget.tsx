@@ -295,7 +295,7 @@ export function ChatWidget() {
                 className="w-10 h-10 rounded-xl bg-bronze text-white flex items-center justify-center hover:bg-bronze-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-5 h-5 -scale-x-100"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
