@@ -8,9 +8,9 @@ import { generateId } from '@/lib/store';
 import { apiPost } from '@/lib/api-client';
 
 const progressBarColors: Record<string, string> = {
+  amber: 'bg-amber-600',
   teal: 'bg-teal',
-  bronze: 'bg-bronze',
-  'rose-soft': 'bg-rose-soft',
+  indigo: 'bg-indigo-500',
 };
 
 export default function QuizPage({ params }: { params: Promise<{ slug: string }> }) {

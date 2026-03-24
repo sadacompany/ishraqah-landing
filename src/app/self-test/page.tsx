@@ -2,6 +2,14 @@ import Link from 'next/link';
 import { quizzes } from '@/data/quiz';
 
 const colorMap: Record<string, { bg: string; bgLight: string; text: string; border: string; btnBg: string; btnHover: string }> = {
+  amber: {
+    bg: 'bg-amber-50',
+    bgLight: 'bg-amber-50/50',
+    text: 'text-amber-600',
+    border: 'border-amber-200',
+    btnBg: 'bg-amber-600',
+    btnHover: 'hover:bg-amber-700',
+  },
   teal: {
     bg: 'bg-teal-pale/50',
     bgLight: 'bg-teal-pale/30',
@@ -10,21 +18,13 @@ const colorMap: Record<string, { bg: string; bgLight: string; text: string; bord
     btnBg: 'bg-teal',
     btnHover: 'hover:bg-teal-light',
   },
-  bronze: {
-    bg: 'bg-bronze-glow/40',
-    bgLight: 'bg-bronze-glow/20',
-    text: 'text-bronze',
-    border: 'border-bronze-glow',
-    btnBg: 'bg-bronze',
-    btnHover: 'hover:bg-bronze-light',
-  },
-  'rose-soft': {
-    bg: 'bg-rose-soft/20',
-    bgLight: 'bg-rose-soft/10',
-    text: 'text-rose-soft',
-    border: 'border-rose-soft/30',
-    btnBg: 'bg-rose-soft',
-    btnHover: 'hover:bg-rose-soft/80',
+  indigo: {
+    bg: 'bg-indigo-50',
+    bgLight: 'bg-indigo-50/50',
+    text: 'text-indigo-500',
+    border: 'border-indigo-200',
+    btnBg: 'bg-indigo-500',
+    btnHover: 'hover:bg-indigo-600',
   },
 };
 
@@ -64,7 +64,7 @@ export default function SelfTestPage() {
               className={`bg-white rounded-2xl border ${colors.border} overflow-hidden transition-shadow hover:shadow-lg`}
             >
               <div className={`${colors.bg} p-6 flex items-center justify-center`}>
-                <div className={`w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-sm`}>
+                <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-sm">
                   <svg
                     className={`w-8 h-8 ${colors.text}`}
                     aria-hidden="true"

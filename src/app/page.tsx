@@ -249,9 +249,9 @@ export default async function Home() {
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             {quizzes.map((quiz) => {
               const colorStyles: Record<string, { bg: string; iconText: string; border: string; btnBg: string; btnHover: string }> = {
+                amber: { bg: 'bg-amber-50', iconText: 'text-amber-600', border: 'border-amber-200', btnBg: 'bg-amber-600', btnHover: 'hover:bg-amber-700' },
                 teal: { bg: 'bg-teal-pale/40', iconText: 'text-teal', border: 'border-teal-pale', btnBg: 'bg-teal', btnHover: 'hover:bg-teal-light' },
-                bronze: { bg: 'bg-bronze-glow/30', iconText: 'text-bronze', border: 'border-bronze-glow', btnBg: 'bg-bronze', btnHover: 'hover:bg-bronze-light' },
-                'rose-soft': { bg: 'bg-rose-soft/15', iconText: 'text-rose-soft', border: 'border-rose-soft/30', btnBg: 'bg-rose-soft', btnHover: 'hover:bg-rose-soft/80' },
+                indigo: { bg: 'bg-indigo-50', iconText: 'text-indigo-500', border: 'border-indigo-200', btnBg: 'bg-indigo-500', btnHover: 'hover:bg-indigo-600' },
               };
               const cs = colorStyles[quiz.color] || colorStyles.teal;
               return (
