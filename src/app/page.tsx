@@ -68,20 +68,25 @@ export default async function Home() {
       </section>
 
       {/* Trust Indicators */}
-      <section className="border-b border-cream-dark/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <section className="bg-charcoal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: '+20', label: 'سنة خبرة' },
-              { value: '+350', label: 'مقال متخصص' },
-              { value: '+200', label: 'استشارة' },
-              { value: '+5000', label: 'مستفيد' },
+              { value: '+15', label: 'سنة خبرة', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+              { value: '+350', label: 'مقال متخصص', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+              { value: '+200', label: 'استشارة', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+              { value: '+5000', label: 'مستفيد', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
             ].map((stat, i) => (
-              <div key={i}>
-                <div className="text-2xl font-bold text-bronze">
+              <div key={i} className="flex flex-col items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-1">
+                  <svg className="w-5 h-5 text-bronze-light" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d={stat.icon} />
+                  </svg>
+                </div>
+                <div className="text-3xl sm:text-4xl font-bold text-white">
                   {stat.value}
                 </div>
-                <div className="text-xs text-charcoal-light mt-1">
+                <div className="text-sm text-white/60">
                   {stat.label}
                 </div>
               </div>
