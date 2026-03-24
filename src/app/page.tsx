@@ -401,32 +401,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-bronze-glow/30 to-cream-warm">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-charcoal leading-relaxed">
-            هل تحتاج إلى استشارة نفسية أو تربوية؟
-          </h2>
-          <p className="mt-4 text-charcoal-light leading-relaxed">
-            لا تتردد في طلب المساعدة. الاستشارة هي البذرة التي إن استثمرتها
-            أنبتت شجرة تُظلك.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/consultations/new"
-              className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-bronze hover:bg-bronze-light rounded-xl transition-colors shadow-sm"
-            >
-              أرسل استشارتك الآن
-            </Link>
-            <Link
-              href="/about"
-              className="inline-flex items-center px-6 py-3 text-sm font-medium text-charcoal bg-white hover:bg-cream-warm rounded-xl transition-colors border border-cream-dark/50"
-            >
-              تعرف علينا
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
