@@ -30,9 +30,17 @@ const pageNames: Record<string, string> = {
   '/admin': 'لوحة التحكم',
 };
 
+const quizPageNames: Record<string, string> = {
+  '/self-test/panic': 'اختبار نوبات الهلع',
+  '/self-test/anxiety': 'اختبار القلق',
+  '/self-test/depression': 'اختبار الاكتئاب',
+};
+
 function getPageName(path: string): string {
   if (pageNames[path]) return pageNames[path];
+  if (quizPageNames[path]) return quizPageNames[path];
   if (path.startsWith('/articles/')) return 'مقال: ' + path.replace('/articles/', '');
+  if (path.startsWith('/self-test/')) return 'اختبار: ' + path.replace('/self-test/', '');
   if (path.startsWith('/admin/')) return 'لوحة التحكم';
   return path;
 }

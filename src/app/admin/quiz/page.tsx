@@ -4,6 +4,13 @@ import { useQuizResults } from '@/lib/hooks/useQuizResults';
 import { EmptyState } from '@/components/admin/EmptyState';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { useState } from 'react';
+import { getQuizBySlug } from '@/data/quiz';
+
+const quizLabels: Record<string, string> = {
+  panic: 'نوبات الهلع',
+  anxiety: 'القلق',
+  depression: 'الاكتئاب',
+};
 
 export default function AdminQuizPage() {
   const { items, loading, remove } = useQuizResults();
@@ -12,12 +19,28 @@ export default function AdminQuizPage() {
 
   const sorted = [...items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  // Distribution stats
+  // Distribution stats (based on result color)
   const distribution = {
-    none: items.filter((q) => q.totalScore <= 6).length,
-    mild: items.filter((q) => q.totalScore >= 7 && q.totalScore <= 13).length,
-    moderate: items.filter((q) => q.totalScore >= 14 && q.totalScore <= 18).length,
-    notable: items.filter((q) => q.totalScore >= 19).length,
+    none: items.filter((q) => {
+      const quiz = getQuizBySlug(q.quizSlug || 'panic');
+      const result = quiz?.results.find((r) => q.totalScore >= r.range[0] && q.totalScore <= r.range[1]);
+      return result?.color === 'emerald';
+    }).length,
+    mild: items.filter((q) => {
+      const quiz = getQuizBySlug(q.quizSlug || 'panic');
+      const result = quiz?.results.find((r) => q.totalScore >= r.range[0] && q.totalScore <= r.range[1]);
+      return result?.color === 'amber';
+    }).length,
+    moderate: items.filter((q) => {
+      const quiz = getQuizBySlug(q.quizSlug || 'panic');
+      const result = quiz?.results.find((r) => q.totalScore >= r.range[0] && q.totalScore <= r.range[1]);
+      return result?.color === 'orange';
+    }).length,
+    notable: items.filter((q) => {
+      const quiz = getQuizBySlug(q.quizSlug || 'panic');
+      const result = quiz?.results.find((r) => q.totalScore >= r.range[0] && q.totalScore <= r.range[1]);
+      return result?.color === 'red';
+    }).length,
   };
 
   const avgScore = items.length > 0
@@ -60,7 +83,7 @@ export default function AdminQuizPage() {
 
       <div className="flex gap-3">
         <div className="flex-1 bg-white rounded-xl border border-cream-dark/30 p-4">
-          <p className="text-sm text-charcoal-light">متوسط الدرجات: <span className="font-bold text-charcoal">{avgScore}</span> من 24</p>
+          <p className="text-sm text-charcoal-light">متوسط الدرجات: <span className="font-bold text-charcoal">{avgScore}</span></p>
         </div>
         {followUpCount > 0 && (
           <div className="bg-teal-pale rounded-xl border border-teal-light/30 p-4">
@@ -76,7 +99,10 @@ export default function AdminQuizPage() {
       ) : (
         <div className="space-y-3">
           {sorted.map((q) => {
-            const color = q.totalScore <= 6 ? 'emerald' : q.totalScore <= 13 ? 'amber' : q.totalScore <= 18 ? 'orange' : 'red';
+            const quizData = getQuizBySlug(q.quizSlug || 'panic');
+            const maxScore = quizData ? quizData.questions.length * 3 : 24;
+            const resultObj = quizData?.results.find((r) => q.totalScore >= r.range[0] && q.totalScore <= r.range[1]);
+            const color = resultObj?.color === 'emerald' ? 'emerald' : resultObj?.color === 'amber' ? 'amber' : resultObj?.color === 'orange' ? 'orange' : 'red';
             const hasContact = q.name || q.phone || q.email;
             return (
               <div key={q.id} className="bg-white rounded-xl border border-cream-dark/30 p-4">
@@ -86,8 +112,13 @@ export default function AdminQuizPage() {
                       <span className={`text-sm font-bold text-${color}-600`}>{q.totalScore}</span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-charcoal">{q.resultTitle}</p>
-                      <p className="text-xs text-charcoal-light">{new Date(q.createdAt).toLocaleDateString('ar-SA')} · الدرجة: {q.totalScore}/24</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-charcoal">{q.resultTitle}</p>
+                        <span className="text-[10px] bg-cream-warm text-charcoal-light px-2 py-0.5 rounded-full">
+                          {quizLabels[q.quizSlug || 'panic'] || q.quizSlug}
+                        </span>
+                      </div>
+                      <p className="text-xs text-charcoal-light">{new Date(q.createdAt).toLocaleDateString('ar-SA')} · الدرجة: {q.totalScore}/{maxScore}</p>
                     </div>
                   </div>
                   <button

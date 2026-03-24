@@ -14,6 +14,7 @@ export interface ConsultationRequest {
 
 export interface QuizSubmission {
   id: string;
+  quizSlug?: string;
   answers: number[];
   totalScore: number;
   resultTitle: string;

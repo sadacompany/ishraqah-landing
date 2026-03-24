@@ -4,6 +4,7 @@ import { SectionHeading } from '@/components/SectionHeading';
 import { ArticleCard } from '@/components/ArticleCard';
 import { FounderBio } from '@/components/FounderBio';
 import { QuoteCard } from '@/components/QuoteCard';
+import { quizzes } from '@/data/quiz';
 import pool from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -241,40 +242,54 @@ export default async function Home() {
       {/* Self-Test Teaser */}
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-teal-pale/50 to-cream-warm rounded-2xl p-8 sm:p-12 border border-teal-pale">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="shrink-0 w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-sm">
-                <svg
-                  className="w-10 h-10 text-teal"
-                  aria-hidden="true"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          <SectionHeading
+            title="اختبر نفسك"
+            subtitle="اختبارات توعوية مجانية لتقييم صحتك النفسية"
+          />
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {quizzes.map((quiz) => {
+              const colorStyles: Record<string, { bg: string; iconText: string; border: string; btnBg: string; btnHover: string }> = {
+                teal: { bg: 'bg-teal-pale/40', iconText: 'text-teal', border: 'border-teal-pale', btnBg: 'bg-teal', btnHover: 'hover:bg-teal-light' },
+                bronze: { bg: 'bg-bronze-glow/30', iconText: 'text-bronze', border: 'border-bronze-glow', btnBg: 'bg-bronze', btnHover: 'hover:bg-bronze-light' },
+                'rose-soft': { bg: 'bg-rose-soft/15', iconText: 'text-rose-soft', border: 'border-rose-soft/30', btnBg: 'bg-rose-soft', btnHover: 'hover:bg-rose-soft/80' },
+              };
+              const cs = colorStyles[quiz.color] || colorStyles.teal;
+              return (
+                <div
+                  key={quiz.slug}
+                  className={`bg-white rounded-2xl border ${cs.border} p-6 transition-shadow hover:shadow-lg flex flex-col`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                  />
-                </svg>
-              </div>
-              <div className="flex-1 text-center sm:text-right">
-                <h3 className="text-xl font-bold text-charcoal">
-                  اختبر نفسك: اختبار نوبات الهلع
-                </h3>
-                <p className="mt-2 text-charcoal-light text-sm leading-relaxed">
-                  اختبار توعوي يساعدك على تقييم مدى تعرضك لأعراض نوبات الهلع.
-                  نتائج فورية مع توصيات مخصصة.
-                </p>
-              </div>
-              <Link
-                href="/self-test"
-                className="shrink-0 inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-teal hover:bg-teal-light rounded-xl transition-colors"
-              >
-                ابدأ الاختبار
-              </Link>
-            </div>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`w-12 h-12 shrink-0 rounded-xl ${cs.bg} flex items-center justify-center`}>
+                      <svg
+                        className={`w-6 h-6 ${cs.iconText}`}
+                        aria-hidden="true"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d={quiz.icon} />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-bold text-charcoal">{quiz.title}</h3>
+                  </div>
+                  <p className="text-sm text-charcoal-light leading-relaxed mb-4 flex-1 line-clamp-2">
+                    {quiz.description}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-charcoal-light mb-4">
+                    <span>{quiz.questions.length} أسئلة</span>
+                    <span>{Math.ceil(quiz.questions.length * 0.5)} دقائق</span>
+                  </div>
+                  <Link
+                    href={`/self-test/${quiz.slug}`}
+                    className={`block text-center w-full px-5 py-3 text-sm font-medium text-white ${cs.btnBg} ${cs.btnHover} rounded-xl transition-colors`}
+                  >
+                    ابدأ الاختبار
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

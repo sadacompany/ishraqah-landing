@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS consultations (
 
 CREATE TABLE IF NOT EXISTS quiz_submissions (
   id VARCHAR(64) PRIMARY KEY,
+  quiz_slug VARCHAR(50) DEFAULT 'panic',
   answers JSONB NOT NULL,
   total_score INTEGER NOT NULL,
   result_title VARCHAR(255) NOT NULL,
