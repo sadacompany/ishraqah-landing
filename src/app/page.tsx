@@ -3,27 +3,21 @@ import Link from 'next/link';
 import { SectionHeading } from '@/components/SectionHeading';
 import { ArticleCard } from '@/components/ArticleCard';
 import { FounderBio } from '@/components/FounderBio';
-import { ConsultationCard } from '@/components/ConsultationCard';
+import { QuoteCard } from '@/components/QuoteCard';
 import pool from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const [articlesResult, featuredResult, consultationsResult] = await Promise.all([
+  const [articlesResult, featuredResult, quotesResult] = await Promise.all([
     pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, image_url as "imageUrl", read_time as "readTime" FROM articles WHERE hidden = false ORDER BY created_at DESC LIMIT 7`),
     pool.query(`SELECT id, slug, title, excerpt, category, category_label as "categoryLabel", featured, image_url as "imageUrl", read_time as "readTime" FROM articles WHERE featured = true AND hidden = false ORDER BY created_at DESC LIMIT 3`),
-    pool.query(`SELECT id, type as category, text as question, answer FROM consultations WHERE status = 'archived' AND answer != '' ORDER BY created_at DESC LIMIT 3`),
+    pool.query(`SELECT id, text FROM quotes WHERE hidden = false ORDER BY created_at DESC LIMIT 6`),
   ]);
 
   const articles = articlesResult.rows;
   const featuredArticles = featuredResult.rows;
-  const consultations = consultationsResult.rows.map((c: { id: string; category: string; question: string; answer: string }) => ({
-    id: c.id,
-    title: c.category || 'استشارة',
-    question: c.question,
-    answer: c.answer,
-    category: c.category || 'عامة',
-  }));
+  const quotes = quotesResult.rows;
 
   return (
     <>
@@ -181,100 +175,23 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Consultation Pathways */}
-      <section className="py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            title="الاستشارات"
-            subtitle="نقدم لك خدمة الاستشارة النفسية والتربوية بسرية تامة"
-            centered
-          />
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'استشارة جديدة',
-                desc: 'أرسل استشارتك النفسية أو التربوية واحصل على رد متخصص.',
-                href: '/consultations/new',
-                icon: (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 4v16m8-8H4"
-                  />
-                ),
-                color: 'bronze',
-              },
-              {
-                title: 'متابعة استشارة',
-                desc: 'تابع استشارتك السابقة واطلع على الرد.',
-                href: '/consultations/follow-up',
-                icon: (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                ),
-                color: 'teal',
-              },
-              {
-                title: 'أرشيف الاستشارات',
-                desc: 'استعرض الاستشارات المنشورة للاستفادة منها.',
-                href: '/consultations/archive',
-                icon: (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                ),
-                color: 'charcoal',
-              },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group bg-white rounded-2xl p-6 border border-cream-dark/30 hover:border-bronze-glow hover:shadow-md transition-[border-color,box-shadow,color] duration-200 text-center"
-              >
-                <div
-                  className={`w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4 ${
-                    item.color === 'bronze'
-                      ? 'bg-bronze-glow/30'
-                      : item.color === 'teal'
-                        ? 'bg-teal-pale'
-                        : 'bg-cream-warm'
-                  }`}
-                >
-                  <svg
-                    className={`w-6 h-6 ${
-                      item.color === 'bronze'
-                        ? 'text-bronze'
-                        : item.color === 'teal'
-                          ? 'text-teal'
-                          : 'text-charcoal-light'
-                    }`}
-                    aria-hidden="true"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    {item.icon}
-                  </svg>
-                </div>
-                <h3 className="text-base font-bold text-charcoal group-hover:text-bronze transition-colors">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm text-charcoal-light leading-relaxed">
-                  {item.desc}
-                </p>
-              </Link>
-            ))}
+      {/* خربشات قلم */}
+      {quotes.length > 0 && (
+        <section className="py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeading
+              title="خربشات قلم"
+              subtitle="كلمات من القلب لإشراقة في حياتك"
+              centered
+            />
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {quotes.map((q) => (
+                <QuoteCard key={q.id} quote={q} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Book Highlight */}
       <section className="py-16 sm:py-20 bg-charcoal text-white">
@@ -353,43 +270,6 @@ export default async function Home() {
                 ابدأ الاختبار
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sample Consultations */}
-      <section className="py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-8">
-            <SectionHeading
-              title="من أرشيف الاستشارات"
-              subtitle="استشارات منشورة للتوعية والاستفادة"
-            />
-            <Link
-              href="/consultations/archive"
-              className="hidden sm:inline-flex items-center gap-1 text-sm text-bronze hover:text-bronze-light transition-colors font-medium"
-            >
-              عرض الأرشيف
-              <svg
-                className="w-4 h-4"
-                aria-hidden="true"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {consultations.map((c) => (
-              <ConsultationCard key={c.id} consultation={c} />
-            ))}
           </div>
         </div>
       </section>

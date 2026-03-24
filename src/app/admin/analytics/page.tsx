@@ -174,7 +174,7 @@ export default function AdminAnalyticsPage() {
         </div>
         <div className="bg-cream-warm rounded-xl p-4 text-center">
           <p className="text-xl font-bold text-charcoal">{cc.quotes}</p>
-          <p className="text-xs text-charcoal-light">الاقتباسات</p>
+          <p className="text-xs text-charcoal-light">خربشات قلم</p>
         </div>
         <div className="bg-white rounded-xl border border-cream-dark/30 p-4 text-center">
           <p className="text-xl font-bold text-charcoal">{cc.articles + cc.consultations + cc.quizSubmissions + cc.guestbookEntries + cc.quotes}</p>

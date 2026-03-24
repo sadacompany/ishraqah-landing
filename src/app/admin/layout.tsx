@@ -11,7 +11,7 @@ const pageTitles: Record<string, string> = {
   '/admin/articles': 'المقالات',
   '/admin/quiz': 'نتائج الاختبار',
   '/admin/guestbook': 'بصمة الزوار',
-  '/admin/quotes': 'الاقتباسات',
+  '/admin/quotes': 'خربشات قلم',
   '/admin/analytics': 'التحليلات',
 };
 

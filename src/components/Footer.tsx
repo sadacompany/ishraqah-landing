@@ -46,7 +46,7 @@ export function Footer() {
             <ul className="space-y-2.5">
               {[
                 { label: 'استشارة جديدة', href: '/consultations/new' },
-                { label: 'أرشيف الاستشارات', href: '/consultations/archive' },
+                { label: 'متابعة استشارة', href: '/consultations/follow-up' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
